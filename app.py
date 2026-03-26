@@ -1,7 +1,7 @@
 """Datasheet PDF Generator — Flask Web App."""
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, Response
 
 from config import BASE_DIR, OUTPUT_DIR, WEB_TEMPLATE_DIR
 from services.data_loader import load_product, list_available_products
@@ -74,6 +74,19 @@ def preview(model_name):
     current_version = get_current_version(model_name) or "draft"
     html = render_html(product, current_version)
     return html
+
+
+@app.route("/drive-image/<file_id>")
+def drive_image(file_id):
+    """Proxy Google Drive images through the server (handles auth)."""
+    from services.drive_images import download_file
+    try:
+        data, mime_type = download_file(file_id)
+        return Response(data, mimetype=mime_type, headers={
+            "Cache-Control": "public, max-age=86400",
+        })
+    except Exception:
+        return "", 404
 
 
 if __name__ == "__main__":

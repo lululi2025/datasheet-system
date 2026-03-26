@@ -6,6 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from config import BASE_DIR, TEMPLATE_DIR
 from models import ProductBase
+from services.drive_images import get_image_urls
 
 
 def _split_spec_sections(sections: list) -> tuple[list, list]:
@@ -39,15 +40,19 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
 
     left_sections, right_sections = _split_spec_sections(product.spec_sections)
 
-    # Use URL paths for images (served via Flask static)
+    # Use URL paths for images
     logo_path = "/static/logo/engenius_cloud_icon.png"
-    product_image = ""
-    if product.product_image:
-        # Convert "cache/images/X.png" or absolute path to "/static/images/X.png"
+
+    # Try Google Drive first, fall back to local static files
+    drive_urls = get_image_urls(product.model_name)
+    product_image = drive_urls["product_image"]
+    hardware_image = drive_urls["hardware_image"]
+
+    # Fallback to local static files if Drive URLs not available
+    if not product_image and product.product_image:
         img_name = os.path.basename(product.product_image)
         product_image = f"/static/images/{img_name}"
-    hardware_image = ""
-    if product.hardware_image:
+    if not hardware_image and product.hardware_image:
         img_name = os.path.basename(product.hardware_image)
         hardware_image = f"/static/images/{img_name}"
 

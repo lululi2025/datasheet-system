@@ -7,3 +7,5 @@ cache/
 .DS_Store
 Template PDF/
 .claude/
+.vercel
+service-account-key.json
