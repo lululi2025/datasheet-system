@@ -51,14 +51,12 @@ body {
     position: relative;
 }
 
-.top-bar-full .logo-text {
+.top-bar-full .logo-img {
     position: absolute;
     left: 36pt;
-    top: 30pt;
-    font-weight: 500;
-    font-size: 28pt;
-    color: white;
-    letter-spacing: -0.5pt;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 46pt;
 }
 
 .top-bar-full .title-area {
@@ -302,21 +300,6 @@ body {
     object-fit: contain;
 }
 
-.hardware-labels-list {
-    text-align: center;
-    margin-top: 16pt;
-}
-
-.hardware-label-item {
-    display: inline-block;
-    font-weight: 500;
-    font-size: 7.8pt;
-    color: #6f7073;
-    margin: 4pt 12pt;
-    padding: 3pt 8pt;
-    border: 0.5pt solid #03a9f4;
-    border-radius: 2pt;
-}
 
 /* Footer */
 .footer {
@@ -348,8 +331,6 @@ body {
     color: #6d6e71;
     margin-top: 4pt;
 }
-
-}
 </style>
 </head>
 <body>
@@ -357,7 +338,7 @@ body {
 <!-- ==================== PAGE 1: COVER ==================== -->
 <div class="page">
     <div class="top-bar-full">
-        <div class="logo-text">EnGenius</div>
+        <img class="logo-img" src="/static/logo/EnGenius-Logo-white.png" alt="EnGenius">
         <div class="title-area">
             <span class="title-prefix">Datasheet |</span>
             <span class="title-category"> {{ product.product_line }}</span>
@@ -448,13 +429,7 @@ body {
         </div>
         {% endif %}
 
-        {% if product.hardware_labels %}
-        <div class="hardware-labels-list">
-            {% for label in product.hardware_labels %}
-            <span class="hardware-label-item">{{ label.text }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
+        {# Hardware labels are already included in the hardware image with callout lines #}
     </div>
 
     <div class="footer">
