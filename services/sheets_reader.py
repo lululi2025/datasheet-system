@@ -48,7 +48,9 @@ def _fetch_csv(gid: str) -> list[list[str]]:
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}"
     resp = requests.get(url, timeout=15)
     resp.raise_for_status()
-    reader = csv.reader(io.StringIO(resp.text))
+    # Force UTF-8 decoding — Google Sheets exports UTF-8 but requests may guess wrong
+    text = resp.content.decode("utf-8")
+    reader = csv.reader(io.StringIO(text))
     return list(reader)
 
 
