@@ -1,6 +1,6 @@
 # CLAUDE.md — Project Context
 
-> Last updated: 2026-03-26
+> Last updated: 2026-03-26 (session 2)
 
 ## Project Overview
 
@@ -75,9 +75,10 @@ vercel deploy --prod --yes
 ### ⚠️ Pending / Known Issues
 
 - **Features parsing 可能有問題** — Google Sheets 的 Key Feature Lists 是單一 cell 內 `\n* ` 分隔，已寫好解析邏輯但尚未完整驗證
-- **Google Drive 圖片串接** — 目前圖片是本地檔案，尚未從 Drive 自動下載
+- **Google Drive 圖片串接** — 決定用 Google Drive API + API Key 自動抓圖。需要到 Google Cloud Console 建專案、啟用 Drive API、建立 API Key。圖片命名規則：`{型號}_product.png`（產品照）、`{型號}_hardware.png`（硬體圖）
+- **PDF 輸出方式待改** — 目前用瀏覽器列印存 PDF，但跟 HTML 預覽有差異（邊距、背景色、分頁）。計畫改用 **html2pdf.js**（客戶端截圖式，視覺完全一致，免費，不需換平台）
 - **其他產品線模板** — 目前只有 Camera，還需要 Switch、Access Point 等
-- **Vercel 上無法 server-side 生成 PDF** — WeasyPrint 需要原生 C 函式庫，Vercel 不支援；目前用瀏覽器列印替代
+- **Vercel 上無法 server-side 生成 PDF** — WeasyPrint 需要原生 C 函式庫，Vercel 不支援
 
 ## 替代方案筆記
 
@@ -97,3 +98,21 @@ vercel deploy --prod --yes
 - **Template 命名是 category 的小寫** — `CameraProduct.category = "Cameras"` → template 檔名是 `cameras.html`（注意複數）
 - **Google Sheets features 在單一 cell** — 不是多行，是一個 cell 裡用 `\n* ` 分隔，解析時要 split
 - **專案路徑有空格** — `/Users/lulu/AI Project/Datasheet System/`，指令要加引號
+- **Google Drive MCP 工具只能搜資料夾和 Google Docs** — 無法搜尋/讀取圖片檔（PNG/JPG），需用 Drive API 或請使用者提供分享連結
+- **Vercel deploy blocked by unknown committer** — Git commit email 必須對應 GitHub 帳號，用 `194753981+lululi2025@users.noreply.github.com`；或用 `vercel deploy --prod --yes` CLI 直接部署繞過
+
+## Google Drive 圖片資料夾結構
+
+```
+Datasheet 素材（共用 Drive）/
+  01. Cloud/
+    05.Camera/
+      ECC100/          ← folder ID: 1Qje0iighD8jaGRkv6Qe4iAEIiwY1nNp4
+        ECC100_product.png
+        ECC100_hardware.png
+      ECC120/          ← folder ID: 1SWB05G3btQ6TtHqxhCAb11ow-9RxmqWq
+      ECC500/
+```
+
+- 固定圖片（logo、icon）→ 放 `static/logo/`，模板直接引用
+- 產品圖片 → 從 Google Drive 動態載入，命名規則 `{型號}_product.png` / `{型號}_hardware.png`
