@@ -1,0 +1,44 @@
+{% extends "web/layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Product Line</th>
+                <th>Current Version</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for model_name in products %}
+            {% set ver_info = versions.get(model_name) %}
+            <tr>
+                <td><strong>{{ model_name }}</strong></td>
+                <td>{{ product_details.get(model_name, {}).get('product_line', '-') }}</td>
+                <td>
+                    {% if ver_info %}
+                    <span class="status-badge status-generated">v{{ ver_info.current_version }}</span>
+                    {% else %}
+                    <span class="status-badge status-new">New</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if ver_info and ver_info.history %}
+                    {{ ver_info.history[-1].date }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/product/{{ model_name }}" class="btn btn-sm btn-primary">Open</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

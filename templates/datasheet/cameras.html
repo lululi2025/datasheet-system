@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+/* ===== GLOBAL ===== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+@page {
+    size: letter;
+    margin: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #6f6f6f;
+    font-size: 7pt;
+    line-height: 1.4;
+}
+
+/* ===== PAGE STRUCTURE ===== */
+.page {
+    width: 612pt;
+    height: 792pt;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+}
+
+.page:last-child {
+    page-break-after: avoid;
+}
+
+/* ===== TOP BAR (all pages) ===== */
+.top-bar {
+    background: #03a9f4;
+    height: 21pt;
+    width: 100%;
+}
+
+.top-bar-full {
+    background: #03a9f4;
+    height: 94pt;
+    width: 100%;
+    position: relative;
+}
+
+.top-bar-full .logo-text {
+    position: absolute;
+    left: 36pt;
+    top: 30pt;
+    font-weight: 500;
+    font-size: 28pt;
+    color: white;
+    letter-spacing: -0.5pt;
+}
+
+.top-bar-full .title-area {
+    position: absolute;
+    right: 27pt;
+    top: 44pt;
+}
+
+.top-bar-full .title-prefix {
+    font-weight: 300;
+    font-size: 12pt;
+    color: white;
+}
+
+.top-bar-full .title-category {
+    font-weight: 500;
+    font-size: 14pt;
+    color: white;
+}
+
+/* ===== PAGE 1: COVER ===== */
+.cloud-icon {
+    position: absolute;
+    left: 36pt;
+    top: 140pt;
+    width: 87pt;
+    height: 85pt;
+}
+
+.model-name {
+    position: absolute;
+    right: 27pt;
+    top: 104pt;
+    font-weight: 500;
+    font-size: 12pt;
+    color: #03a9f4;
+}
+
+.product-subtitle {
+    position: absolute;
+    left: 134pt;
+    top: 150pt;
+    font-weight: 500;
+    font-size: 19pt;
+    color: #03a9f4;
+}
+
+.product-fullname {
+    position: absolute;
+    left: 134pt;
+    top: 172pt;
+    font-weight: 500;
+    font-size: 24pt;
+    color: #231f20;
+    line-height: 1.3;
+    right: 36pt;
+}
+
+.product-image-container {
+    position: absolute;
+    right: 10pt;
+    top: 330pt;
+    width: 310pt;
+    height: 270pt;
+    text-align: center;
+}
+
+.product-image-container img {
+    max-width: 290pt;
+    max-height: 260pt;
+    object-fit: contain;
+}
+
+/* Overview section */
+.section-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    margin-bottom: 8pt;
+}
+
+.overview-section {
+    position: absolute;
+    left: 36pt;
+    top: 270pt;
+    width: 270pt;
+}
+
+.overview-text {
+    font-weight: 400;
+    font-size: 11pt;
+    color: #6f6f6f;
+    line-height: 1.35;
+}
+
+/* Features section */
+.features-wrapper {
+    position: absolute;
+    left: 36pt;
+    right: 36pt;
+    bottom: 36pt;
+}
+
+.features-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    margin-bottom: 10pt;
+}
+
+.features-box {
+    background: #f0f0f0;
+    padding: 18pt 28pt;
+}
+
+.features-columns {
+    display: table;
+    width: 100%;
+}
+
+.features-col {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+    padding-right: 16pt;
+}
+
+.feature-item {
+    font-weight: 400;
+    font-size: 11pt;
+    color: #4a4a4a;
+    margin-bottom: 8pt;
+    padding-left: 14pt;
+    text-indent: -14pt;
+    line-height: 1.35;
+}
+
+.feature-item::before {
+    content: "•  ";
+    color: #4a4a4a;
+}
+
+/* Page number */
+.page-number {
+    position: absolute;
+    right: 23pt;
+    bottom: 18pt;
+    font-weight: 300;
+    font-size: 7pt;
+    color: #6f7073;
+}
+
+/* ===== PAGE 2+: SPEC TABLE ===== */
+.spec-page {
+    padding: 36pt;
+    padding-top: 0;
+}
+
+.spec-page-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    padding-top: 30pt;
+    margin-bottom: 20pt;
+}
+
+.spec-columns {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.spec-col {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+}
+
+.spec-col:first-child {
+    padding-right: 18pt;
+}
+
+.spec-col:last-child {
+    padding-left: 18pt;
+}
+
+.spec-category-header {
+    background: #03a9f4;
+    color: white;
+    font-weight: 500;
+    font-size: 8pt;
+    padding: 3pt 6pt;
+    margin-top: 10pt;
+    margin-bottom: 4pt;
+}
+
+.spec-category-header:first-child {
+    margin-top: 0;
+}
+
+.spec-row {
+    border-bottom: 0.5pt solid #bcbec0;
+    padding: 3pt 0;
+}
+
+.spec-label {
+    font-weight: 500;
+    font-size: 7pt;
+    color: #03a9f4;
+}
+
+.spec-value {
+    font-weight: 300;
+    font-size: 7pt;
+    color: #6f7073;
+    margin-top: 1pt;
+}
+
+/* ===== PAGE 3: HARDWARE OVERVIEW ===== */
+.hardware-page {
+    padding: 36pt;
+    padding-top: 0;
+}
+
+.hardware-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    padding-top: 32pt;
+    margin-bottom: 16pt;
+}
+
+.hardware-image-container {
+    text-align: center;
+    margin: 20pt auto;
+}
+
+.hardware-image-container img {
+    max-width: 290pt;
+    max-height: 288pt;
+    object-fit: contain;
+}
+
+.hardware-labels-list {
+    text-align: center;
+    margin-top: 16pt;
+}
+
+.hardware-label-item {
+    display: inline-block;
+    font-weight: 500;
+    font-size: 7.8pt;
+    color: #6f7073;
+    margin: 4pt 12pt;
+    padding: 3pt 8pt;
+    border: 0.5pt solid #03a9f4;
+    border-radius: 2pt;
+}
+
+/* Footer */
+.footer {
+    position: absolute;
+    bottom: 28pt;
+    left: 36pt;
+    right: 36pt;
+    border-top: 1pt solid #e0e0e0;
+    padding-top: 10pt;
+}
+
+.footer-logo {
+    font-weight: 500;
+    font-size: 18pt;
+    color: #333;
+    margin-bottom: 6pt;
+}
+
+.footer-disclaimer {
+    font-weight: 300;
+    font-size: 6pt;
+    color: #6d6e71;
+    line-height: 1.4;
+}
+
+.footer-version {
+    font-weight: 300;
+    font-size: 6pt;
+    color: #6d6e71;
+    margin-top: 4pt;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: COVER ==================== -->
+<div class="page">
+    <div class="top-bar-full">
+        <div class="logo-text">EnGenius</div>
+        <div class="title-area">
+            <span class="title-prefix">Datasheet |</span>
+            <span class="title-category"> {{ product.product_line }}</span>
+        </div>
+    </div>
+
+    <span class="model-name">{{ product.model_name }}</span>
+
+    <img class="cloud-icon" src="{{ logo_path }}" alt="">
+    <div class="product-subtitle">{{ product.subtitle }}</div>
+    <div class="product-fullname">{{ product.full_name }}</div>
+
+    {% if product.product_image %}
+    <div class="product-image-container">
+        <img src="{{ product.product_image }}" alt="{{ product.model_name }}">
+    </div>
+    {% endif %}
+
+    <div class="overview-section">
+        <div class="section-title">Overview</div>
+        <div class="overview-text">{{ product.overview }}</div>
+    </div>
+
+    <div class="features-wrapper">
+        <div class="features-title">Features & Benefits</div>
+        <div class="features-box">
+            <div class="features-columns">
+                <div class="features-col">
+                    {% for feature in product.features[:3] %}
+                    <div class="feature-item">{{ feature }}</div>
+                    {% endfor %}
+                </div>
+                <div class="features-col">
+                    {% for feature in product.features[3:] %}
+                    <div class="feature-item">{{ feature }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-number">1</div>
+</div>
+
+<!-- ==================== PAGE 2: TECHNICAL SPECIFICATIONS ==================== -->
+<div class="page">
+    <div class="top-bar"></div>
+    <div class="spec-page">
+        <div class="spec-page-title">Technical Specifications</div>
+
+        <div class="spec-columns">
+            <div class="spec-col">
+                {% for section in left_sections %}
+                <div class="spec-category-header">{{ section.category }}</div>
+                {% for item in section.items %}
+                <div class="spec-row">
+                    <div class="spec-label">{{ item.label }}</div>
+                    <div class="spec-value">{{ item.value }}</div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="spec-col">
+                {% for section in right_sections %}
+                <div class="spec-category-header">{{ section.category }}</div>
+                {% for item in section.items %}
+                <div class="spec-row">
+                    <div class="spec-label">{{ item.label }}</div>
+                    <div class="spec-value">{{ item.value }}</div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="page-number">2</div>
+</div>
+
+<!-- ==================== PAGE 3: HARDWARE OVERVIEW ==================== -->
+<div class="page">
+    <div class="top-bar"></div>
+    <div class="hardware-page">
+        <div class="hardware-title">Hardware Overview</div>
+
+        {% if product.hardware_image %}
+        <div class="hardware-image-container">
+            <img src="{{ product.hardware_image }}" alt="Hardware Overview">
+        </div>
+        {% endif %}
+
+        {% if product.hardware_labels %}
+        <div class="hardware-labels-list">
+            {% for label in product.hardware_labels %}
+            <span class="hardware-label-item">{{ label.text }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <div class="footer-logo">EnGenius<span style="font-size:10pt; vertical-align:super;">®</span></div>
+        <div class="footer-disclaimer">
+            Features and specifications subject to change without notice. Trademarks and registered trademarks are the property of their respective owners. These limits are designed to provide reasonable
+            protection against harmful interference in a residential installation. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the
+            instructions, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required
+            to correct the interference at his/her own expense. Prior to installing any surveillance equipment, it is your responsibility to ensure the installation is in compliance with local, state and federal video
+            and audio surveillance and privacy laws.
+        </div>
+        <div class="footer-version">Version {{ version }}   {{ date }}</div>
+    </div>
+
+    <div class="page-number">3</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "web/layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ product.model_name }} — {{ product.subtitle }}</h2>
+    <p style="color:#888; font-size:14px; margin-bottom:16px;">{{ product.product_line }} | {{ product.full_name }}</p>
+
+    <div style="display:flex; gap:12px; align-items:center;">
+        <a href="/preview/{{ product.model_name }}" class="btn btn-primary" target="_blank">Preview Datasheet</a>
+        <span style="font-size:13px; color:#888;">Open preview, then use Ctrl+P (or Cmd+P) to save as PDF</span>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Specifications Preview</h2>
+    <table>
+        {% for section in product.spec_sections %}
+        <tr><th colspan="2" style="background:#e3f2fd; color:#03a9f4;">{{ section.category }}</th></tr>
+        {% for item in section.items %}
+        <tr>
+            <td style="width:35%; color:#03a9f4; font-weight:500;">{{ item.label }}</td>
+            <td>{{ item.value }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

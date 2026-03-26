@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+output/
+cache/
+.env
+.DS_Store
+Template PDF/
+.claude/

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datasheet Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .navbar { background: #03a9f4; padding: 16px 32px; color: white; display: flex; align-items: center; gap: 16px; }
+        .navbar h1 { font-size: 20px; font-weight: 500; }
+        .navbar a { color: white; text-decoration: none; opacity: 0.8; font-size: 14px; }
+        .navbar a:hover { opacity: 1; }
+        .container { max-width: 1000px; margin: 32px auto; padding: 0 24px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 20px; }
+        .card h2 { font-size: 18px; margin-bottom: 16px; color: #231f20; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { color: #888; font-weight: 500; font-size: 12px; text-transform: uppercase; }
+        .btn { display: inline-block; padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; text-decoration: none; }
+        .btn-primary { background: #03a9f4; color: white; }
+        .btn-primary:hover { background: #0288d1; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        .btn-outline { background: transparent; border: 1px solid #03a9f4; color: #03a9f4; }
+        .btn-outline:hover { background: #e1f5fe; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .status-new { background: #e8f5e9; color: #2e7d32; }
+        .status-generated { background: #e3f2fd; color: #1565c0; }
+        .flash { padding: 12px 20px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
+        .flash-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .flash-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        input[type="text"], textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        textarea { resize: vertical; min-height: 60px; }
+        label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; }
+        .form-group { margin-bottom: 16px; }
+        .version-history { margin-top: 16px; }
+        .version-history li { list-style: none; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .preview-frame { width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 4px; background: white; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Datasheet Generator</h1>
+        <a href="/">Dashboard</a>
+    </div>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{
+  "model_name": "ECC100",
+  "product_line": "AI Cloud Cameras",
+  "category": "Cameras",
+  "subtitle": "Cam5MP Dome IP67",
+  "full_name": "Cloud Managed AI Outdoor Dome with 256GB Storage",
+  "overview": "The EnGenius Cloud Camera Cam5MP Dome (ECC100) is a cloud-managed outdoor surveillance solution for SMBs seeking scalable security. It enables seamless remote monitoring via the cloud dashboard and mobile app. This camera includes 256GB of built-in storage for reliable HD video recording, reducing reliance on traditional NVRs. Enhanced with a 5MP Sony Starvis sensor with HDR, a 132° viewing angle, and a 20m IR range, it delivers clear imaging in all lighting conditions. IP67 and IK10-rated, it is built to withstand harsh environments. Advanced AI technology detects unusual people and vehicles in real time, triggering instant alerts and enabling AI-powered searches to reduce footage review time from hours to minutes.",
+  "features": [
+    "Cloud Dashboard Management and Mobile App monitoring anywhere",
+    "5MP Sony Starvis sensor with HDR of crystal-clear image quality day and night",
+    "Wide view angles of 132° and long IR distance of 20m fit a complicated environment",
+    "Camera durable 256GB storage for event and continuous recording 24x7",
+    "IP67 and IK10 for tough weather and vandal-resistant",
+    "AI NPU of people and vehicle detection for instant alert, search, and statistics"
+  ],
+  "spec_sections": [
+    {
+      "category": "Optics",
+      "items": [
+        {"label": "Sensor", "value": "1/2.8 \" Sony Starvis 5MP CMOS"},
+        {"label": "Lens", "value": "Fixed 3.16mm"},
+        {"label": "View Angle", "value": "H: 102°, V: 71.6°, D: 132°"},
+        {"label": "Night Vision", "value": "Built-in IR LED illumination and IR cut filter"},
+        {"label": "IR Distance", "value": ">20m / 66ft"},
+        {"label": "Lens Adjustment Range", "value": "Manual, Pan: 0° ~ 350°, Tilt: 0° ~ 90°, Roll: 0° ~ 350°"}
+      ]
+    },
+    {
+      "category": "Video",
+      "items": [
+        {"label": "Resolution", "value": "5MP 2592 x 1944 (4:3)"},
+        {"label": "Frame Rate", "value": "20 FPS"},
+        {"label": "Video Compression", "value": "H.265, H.264"},
+        {"label": "Streaming Bitrate", "value": "768Kbps ~ 2.5Mbps (Optional)"},
+        {"label": "Video Processing", "value": "AE, AWB, AGC, BLC, HLC, WDR, HDR, 3DNR, Privacy Mask, OSD, Video Orientation"}
+      ]
+    },
+    {
+      "category": "Audio",
+      "items": [
+        {"label": "Audio Format", "value": "AAC, G.711"},
+        {"label": "Microphone", "value": "Built-in, 5m / 15ft distance"},
+        {"label": "Speaker", "value": "Not supported"}
+      ]
+    },
+    {
+      "category": "Advanced AI Analytics",
+      "items": [
+        {"label": "AI NPU", "value": "Built-in"},
+        {"label": "People Detection and Tracking", "value": "History search, People counting"},
+        {"label": "Vehicle Detection and Tracking", "value": "History search, Vehicle counting"},
+        {"label": "Tampering Detection", "value": "Event alert"},
+        {"label": "Restricted Area Detection", "value": "Event alert, Object counting"},
+        {"label": "Cross Line Detection", "value": "Event alert, Object counting"},
+        {"label": "EnGenius Cloud AI", "value": "Support"}
+      ]
+    },
+    {
+      "category": "Storage",
+      "items": [
+        {"label": "Storage Size", "value": "256GB on board"},
+        {"label": "Retention Method", "value": "24/7 seamless, Auto Recycling"},
+        {"label": "Retention Days", "value": "Based on video quality and bitrate: 22 days (Good 768kbps), 20 days (Better 1.5Mbps), 10 days (Best 2Mbps)"},
+        {"label": "Storage Redundancy", "value": "Support EnGenius NVS and Cloud storage"}
+      ]
+    },
+    {
+      "category": "System",
+      "items": [
+        {"label": "LED Indicator", "value": "System power and status indicator"},
+        {"label": "RTSP", "value": "Supported"},
+        {"label": "Reset Button", "value": "Internal"},
+        {"label": "Networking Interface", "value": "10/100 MbE RJ45 port"},
+        {"label": "Power Method", "value": "PoE 802.3af Class 3"},
+        {"label": "Max. Power Consumption", "value": "6.5W"},
+        {"label": "Operating Temperature", "value": "-20°C ~ 50°C / -4°F ~ 122°F"},
+        {"label": "Humidity", "value": "98%"},
+        {"label": "Certifications", "value": "CE, FCC"}
+      ]
+    },
+    {
+      "category": "Mechanical",
+      "items": [
+        {"label": "Enclosure Material", "value": "Aluminum alloy, Polycarbonate"},
+        {"label": "Weatherproofing", "value": "IP67"},
+        {"label": "Resistance", "value": "IK10"},
+        {"label": "Dimensions", "value": "Ø121.7 x 94.8 mm (Ø4.79 x 3.73\")"},
+        {"label": "Weight", "value": "525g / 18.5oz"}
+      ]
+    },
+    {
+      "category": "Management Software",
+      "items": [
+        {"label": "Web Browser", "value": "Chrome, Safari, Edge"},
+        {"label": "Mobile App", "value": "Cloud To-Go on iOS and Android"}
+      ]
+    }
+  ],
+  "hardware_labels": [
+    {"text": "Reset Button", "position": "right"},
+    {"text": "Lens", "position": "bottom-center"},
+    {"text": "Microphone", "position": "bottom-right"},
+    {"text": "Light Sensor", "position": "left"},
+    {"text": "IR LEDs", "position": "left"},
+    {"text": "PoE In", "position": "left"},
+    {"text": "LED Indicator", "position": "top"}
+  ],
+  "product_image": "cache/images/ECC100_product.png",
+  "hardware_image": "cache/images/ECC100_hardware.png"
+}
