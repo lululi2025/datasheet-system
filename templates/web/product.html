@@ -6,9 +6,20 @@
     <p style="color:#888; font-size:14px; margin-bottom:16px;">{{ product.product_line }} | {{ product.full_name }}</p>
 
     <div style="display:flex; gap:12px; align-items:center;">
-        <a href="/preview/{{ product.model_name }}" class="btn btn-primary" target="_blank">Preview Datasheet</a>
-        <span style="font-size:13px; color:#888;">Open preview, then use Ctrl+P (or Cmd+P) to save as PDF</span>
+        <button class="btn btn-primary" onclick="printDatasheet()">Save as PDF</button>
+        <a href="/preview/{{ product.model_name }}" class="btn btn-outline" target="_blank">Preview HTML</a>
     </div>
+
+    <!-- Hidden iframe for printing datasheet -->
+    <iframe id="print-frame" src="/preview/{{ product.model_name }}" style="display:none;"></iframe>
+
+    <script>
+    function printDatasheet() {
+        var frame = document.getElementById('print-frame');
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    }
+    </script>
 </div>
 
 <div class="card">
