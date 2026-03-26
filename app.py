@@ -89,8 +89,11 @@ def drive_image(file_id):
 
         # Auto-trim whitespace if requested
         if request.args.get("trim") == "1":
-            data = auto_trim(data)
-            mime_type = "image/png"
+            try:
+                data = auto_trim(data)
+                mime_type = "image/png"
+            except Exception:
+                pass  # Return original image if trim fails
 
         return Response(data, mimetype=mime_type, headers={
             "Cache-Control": "public, max-age=86400",

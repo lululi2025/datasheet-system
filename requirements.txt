@@ -3,3 +3,4 @@ pydantic==2.10.6
 requests==2.32.3
 google-api-python-client==2.193.0
 google-auth==2.49.1
+Pillow==11.1.0
