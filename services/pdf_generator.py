@@ -129,6 +129,13 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
     product_dict["product_image"] = product_image
     product_dict["hardware_image"] = hardware_image
 
+    # QR code pointing to EnGenius product page
+    product_url = f"https://www.engeniustech.com/engenius-cloud/{product.model_name.lower()}"
+    qr_code_url = (
+        f"https://api.qrserver.com/v1/create-qr-code/"
+        f"?size=150x150&data={product_url}"
+    )
+
     html = template.render(
         product=type(product)(**product_dict),
         logo_path=logo_path,
@@ -136,6 +143,7 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
         # Keep backward compatibility
         left_sections=spec_pages[0]["left"] if spec_pages else [],
         right_sections=spec_pages[0]["right"] if spec_pages else [],
+        qr_code_url=qr_code_url,
         version=version,
         date=datetime.now().strftime("%m/%d/%Y"),
     )

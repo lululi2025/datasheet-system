@@ -168,7 +168,7 @@ body {
 }
 
 .features-box {
-    background: #f0f0f0;
+    background: #ebf8fe;
     padding: 18pt 28pt;
 }
 
@@ -244,7 +244,7 @@ body {
 }
 
 .spec-category-header {
-    background: #231f20;
+    background: #6d7781;
     color: white;
     font-weight: 500;
     font-size: 8pt;
@@ -304,32 +304,62 @@ body {
 /* Footer */
 .footer {
     position: absolute;
-    bottom: 28pt;
-    left: 36pt;
-    right: 36pt;
-    border-top: 1pt solid #e0e0e0;
-    padding-top: 10pt;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #eff0f2;
+    padding: 18pt 36pt 28pt 36pt;
+}
+
+.footer-content {
+    display: table;
+    width: 100%;
+}
+
+.footer-left {
+    display: table-cell;
+    vertical-align: top;
+    padding-right: 20pt;
+}
+
+.footer-right {
+    display: table-cell;
+    vertical-align: top;
+    width: 70pt;
+    text-align: center;
 }
 
 .footer-logo {
     font-weight: 500;
-    font-size: 18pt;
-    color: #333;
+    font-size: 16pt;
+    color: #231f20;
     margin-bottom: 6pt;
 }
 
 .footer-disclaimer {
     font-weight: 300;
-    font-size: 6pt;
+    font-size: 5.5pt;
     color: #6d6e71;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .footer-version {
     font-weight: 300;
-    font-size: 6pt;
+    font-size: 5.5pt;
     color: #6d6e71;
     margin-top: 4pt;
+}
+
+.footer-qr img {
+    width: 56pt;
+    height: 56pt;
+}
+
+.footer-qr-label {
+    font-weight: 400;
+    font-size: 6pt;
+    color: #6d6e71;
+    margin-top: 3pt;
 }
 </style>
 </head>
@@ -439,15 +469,25 @@ body {
     </div>
 
     <div class="footer">
-        <div class="footer-logo">EnGenius<span style="font-size:10pt; vertical-align:super;">®</span></div>
-        <div class="footer-disclaimer">
-            Features and specifications subject to change without notice. Trademarks and registered trademarks are the property of their respective owners. These limits are designed to provide reasonable
-            protection against harmful interference in a residential installation. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the
-            instructions, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required
-            to correct the interference at his/her own expense. Prior to installing any surveillance equipment, it is your responsibility to ensure the installation is in compliance with local, state and federal video
-            and audio surveillance and privacy laws.
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">EnGenius<span style="font-size:9pt; vertical-align:super;">®</span></div>
+                <div class="footer-disclaimer">
+                    Features and specifications subject to change without notice. Trademarks and registered trademarks are the property of their respective owners. These limits are designed to provide reasonable
+                    protection against harmful interference in a residential installation. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the
+                    instructions, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required
+                    to correct the interference at his/her own expense. Prior to installing any surveillance equipment, it is your responsibility to ensure the installation is in compliance with local, state and federal video
+                    and audio surveillance and privacy laws.
+                </div>
+                <div class="footer-version">Version {{ version }}   {{ date }}</div>
+            </div>
+            <div class="footer-right">
+                <div class="footer-qr">
+                    <img src="{{ qr_code_url }}" alt="QR Code">
+                </div>
+                <div class="footer-qr-label">Contact Us</div>
+            </div>
         </div>
-        <div class="footer-version">Version {{ version }}   {{ date }}</div>
     </div>
 
     <div class="page-number">{{ spec_pages|length + 2 }}</div>
