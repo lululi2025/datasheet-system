@@ -117,6 +117,10 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
     product_image = drive_urls["product_image"]
     hardware_image = drive_urls["hardware_image"]
 
+    # Auto-trim whitespace for product images from Drive
+    if product_image and product_image.startswith("/drive-image/"):
+        product_image += "?trim=1"
+
     # Fallback to local static files if Drive URLs not available
     if not product_image and product.product_image:
         img_name = os.path.basename(product.product_image)

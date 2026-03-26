@@ -78,10 +78,20 @@ def preview(model_name):
 
 @app.route("/drive-image/<file_id>")
 def drive_image(file_id):
-    """Proxy Google Drive images through the server (handles auth)."""
+    """Proxy Google Drive images through the server (handles auth).
+
+    Supports optional ?trim=1 query param to auto-crop whitespace.
+    """
     from services.drive_images import download_file
+    from services.image_utils import auto_trim
     try:
         data, mime_type = download_file(file_id)
+
+        # Auto-trim whitespace if requested
+        if request.args.get("trim") == "1":
+            data = auto_trim(data)
+            mime_type = "image/png"
+
         return Response(data, mimetype=mime_type, headers={
             "Cache-Control": "public, max-age=86400",
         })
