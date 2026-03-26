@@ -244,7 +244,7 @@ body {
 }
 
 .spec-category-header {
-    background: #03a9f4;
+    background: #231f20;
     color: white;
     font-weight: 500;
     font-size: 8pt;
@@ -383,15 +383,20 @@ body {
     <div class="page-number">1</div>
 </div>
 
-<!-- ==================== PAGE 2: TECHNICAL SPECIFICATIONS ==================== -->
+<!-- ==================== SPEC PAGES (auto-paginated) ==================== -->
+{% for page in spec_pages %}
 <div class="page">
     <div class="top-bar"></div>
     <div class="spec-page">
+        {% if loop.first %}
         <div class="spec-page-title">Technical Specifications</div>
+        {% else %}
+        <div class="spec-page-title">Technical Specifications (cont.)</div>
+        {% endif %}
 
         <div class="spec-columns">
             <div class="spec-col">
-                {% for section in left_sections %}
+                {% for section in page.left %}
                 <div class="spec-category-header">{{ section.category }}</div>
                 {% for item in section.items %}
                 <div class="spec-row">
@@ -402,7 +407,7 @@ body {
                 {% endfor %}
             </div>
             <div class="spec-col">
-                {% for section in right_sections %}
+                {% for section in page.right %}
                 <div class="spec-category-header">{{ section.category }}</div>
                 {% for item in section.items %}
                 <div class="spec-row">
@@ -414,8 +419,9 @@ body {
             </div>
         </div>
     </div>
-    <div class="page-number">2</div>
+    <div class="page-number">{{ loop.index + 1 }}</div>
 </div>
+{% endfor %}
 
 <!-- ==================== PAGE 3: HARDWARE OVERVIEW ==================== -->
 <div class="page">
@@ -444,7 +450,7 @@ body {
         <div class="footer-version">Version {{ version }}   {{ date }}</div>
     </div>
 
-    <div class="page-number">3</div>
+    <div class="page-number">{{ spec_pages|length + 2 }}</div>
 </div>
 
 </body>

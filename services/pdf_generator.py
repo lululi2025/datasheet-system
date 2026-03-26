@@ -8,9 +8,78 @@ from config import BASE_DIR, TEMPLATE_DIR
 from models import ProductBase
 from services.drive_images import get_image_urls
 
+# Height estimates (in pt) for page layout calculation
+_PAGE_HEIGHT = 792
+_TOP_BAR_HEIGHT = 21
+_SPEC_TITLE_HEIGHT = 50  # title + margin
+_BOTTOM_MARGIN = 50  # page number + safety margin
+_AVAILABLE_HEIGHT = _PAGE_HEIGHT - _TOP_BAR_HEIGHT - _SPEC_TITLE_HEIGHT - _BOTTOM_MARGIN
 
-def _split_spec_sections(sections: list) -> tuple[list, list]:
-    """Split spec sections into left and right columns for the spec page."""
+# Per-item height estimates
+_CATEGORY_HEADER_HEIGHT = 24  # header + margins
+_SPEC_ROW_HEIGHT = 20  # label + value + padding
+
+
+def _estimate_section_height(section) -> float:
+    """Estimate the rendered height of a spec section (header + rows)."""
+    return _CATEGORY_HEADER_HEIGHT + len(section.items) * _SPEC_ROW_HEIGHT
+
+
+def _split_into_pages(sections: list) -> list[dict]:
+    """Split spec sections into multiple pages, each with left/right columns.
+
+    Returns a list of pages, each page is:
+        {"left": [sections], "right": [sections]}
+    """
+    if not sections:
+        return [{"left": [], "right": []}]
+
+    # First, split all sections into page-sized groups.
+    # Each page has two columns, so each column has _AVAILABLE_HEIGHT.
+    pages = []
+    remaining = list(sections)
+
+    while remaining:
+        # Greedily fill left column, then right column
+        left = []
+        right = []
+        left_h = 0
+        right_h = 0
+
+        i = 0
+        # Fill left column
+        while i < len(remaining):
+            sh = _estimate_section_height(remaining[i])
+            if left_h + sh <= _AVAILABLE_HEIGHT or not left:
+                # Always add at least one section to left
+                left.append(remaining[i])
+                left_h += sh
+                i += 1
+            else:
+                break
+
+        # Fill right column
+        while i < len(remaining):
+            sh = _estimate_section_height(remaining[i])
+            if right_h + sh <= _AVAILABLE_HEIGHT or not right:
+                right.append(remaining[i])
+                right_h += sh
+                i += 1
+            else:
+                break
+
+        pages.append({"left": left, "right": right})
+        remaining = remaining[i:]
+
+    # If only one page, try to balance left/right columns evenly
+    if len(pages) == 1:
+        pages = [_balance_columns(sections)]
+
+    return pages
+
+
+def _balance_columns(sections: list) -> dict:
+    """Balance sections into left/right columns for a single page."""
     total_items = sum(len(s.items) for s in sections)
     target = total_items / 2
 
@@ -27,7 +96,7 @@ def _split_spec_sections(sections: list) -> tuple[list, list]:
             split_done = True
             right.append(section)
 
-    return left, right
+    return {"left": left, "right": right}
 
 
 def render_html(product: ProductBase, version: str, template_name: str = None) -> str:
@@ -38,7 +107,7 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template(template_name)
 
-    left_sections, right_sections = _split_spec_sections(product.spec_sections)
+    spec_pages = _split_into_pages(product.spec_sections)
 
     # Use URL paths for images
     logo_path = "/static/logo/engenius_cloud_icon.png"
@@ -63,8 +132,10 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
     html = template.render(
         product=type(product)(**product_dict),
         logo_path=logo_path,
-        left_sections=left_sections,
-        right_sections=right_sections,
+        spec_pages=spec_pages,
+        # Keep backward compatibility
+        left_sections=spec_pages[0]["left"] if spec_pages else [],
+        right_sections=spec_pages[0]["right"] if spec_pages else [],
         version=version,
         date=datetime.now().strftime("%m/%d/%Y"),
     )
