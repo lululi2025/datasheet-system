@@ -1,6 +1,6 @@
 # CLAUDE.md — Project Context
 
-> Last updated: 2026-03-27 (session 4)
+> Last updated: 2026-03-27 (session 5)
 
 ## Project Overview
 
@@ -25,6 +25,8 @@ services/
   sheets_reader.py  # Google Sheets CSV 讀取模組
   data_loader.py    # 資料載入（JSON 或 Sheets）
   pdf_generator.py  # HTML 渲染（圖片用 URL 路徑）
+  drive_images.py   # Google Drive API 圖片下載（Service Account）
+  image_utils.py    # 圖片處理（透明邊距裁切）
   version_manager.py # 版本管理（本地用）
 templates/
   datasheet/        # Datasheet HTML 版型（cameras.html）
@@ -82,15 +84,17 @@ vercel deploy --prod --yes
 - Version management 模組（本地用）
 - Google Drive API 串接（Service Account，從共用 Drive 讀取產品圖片）
 - 產品圖片自動裁切透明邊距（Pillow getbbox）
-- QR Code 動態生成（連結到官網產品頁）
-- 規格表自動分頁（內容超過一頁時自動換頁）
+- QR Code 動態生成（連結到官網產品頁，白底方塊內嵌）
+- 規格表自動分頁（內容超過一頁時自動換頁，緊湊排版避免空白過多）
 - PDF 模板色值提取與校正（PyMuPDF + Pillow 像素取樣）
+- Logo 從原始 PDF 提取（白色版 header 用、灰色版 footer 用、cloud icon）
+- Footer 排版（灰底區塊 + EnGenius 灰 logo + 法律聲明 + QR code）
 - UTF-8 encoding 修正（Google Sheets CSV 的 `°` `″` 亂碼）
 
 ### ⚠️ Pending / Known Issues
 
 - **PDF ≠ HTML 預覽** — 瀏覽器列印會加邊距、吃掉背景色，計畫改用 html2pdf.js 或外部 PDF API
-- **Google Drive 圖片未完成** — 需要 Service Account key 或 API Key 才能自動抓圖，目前僅 ECC100/ECC120 有設定 folder ID
+- **Google Drive 圖片部分完成** — Service Account 已設定，ECC100/ECC120 可抓圖，其他產品需補 folder ID
 - **所有產品線共用 cameras.html 模板** — 目前 fallback 到 cameras.html，尚未為 Switch/AP 建立專用模板
 - **Vercel 上無法 server-side 生成 PDF** — WeasyPrint 需要原生 C 函式庫，Vercel 不支援
 
@@ -113,6 +117,8 @@ vercel deploy --prod --yes
 4. **透明邊距先裁掉** — Logo/icon 有透明邊距會導致對齊偏移，用 `Pillow getbbox()` 裁切
 5. **從 PDF 提取 logo** — 尺寸顏色 100% 正確，優於用戶另外提供或 CSS 縮放
 6. **不確定時先提方案** — 列出 2-3 個選項（含優缺點）讓用戶選，不要猜測執行
+7. **每個元素都要對比** — 修改任何 CSS 前，先確認該元素目前是否正確，正確的不動
+8. **參考 PDF 就是唯一真相** — 所有尺寸、位置、顏色、邊距都從 PDF 測量，不靠記憶或假設
 
 ### 已驗證的參考色值
 | 元素 | Hex |
