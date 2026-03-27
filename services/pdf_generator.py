@@ -11,13 +11,13 @@ from services.drive_images import get_image_urls
 # Height estimates (in pt) for page layout calculation
 _PAGE_HEIGHT = 792
 _TOP_BAR_HEIGHT = 21
-_SPEC_TITLE_HEIGHT = 50  # title + margin
-_BOTTOM_MARGIN = 60  # page number + safety margin
+_SPEC_TITLE_HEIGHT = 42  # title + margin
+_BOTTOM_MARGIN = 40  # page number + safety margin
 _AVAILABLE_HEIGHT = _PAGE_HEIGHT - _TOP_BAR_HEIGHT - _SPEC_TITLE_HEIGHT - _BOTTOM_MARGIN
 
-# Per-item height estimates (conservative to account for text wrapping)
-_CATEGORY_HEADER_HEIGHT = 28  # header + margins
-_SPEC_ROW_HEIGHT = 28  # label + value + padding (some values wrap to 2 lines)
+# Per-item height estimates (tight layout matching reference PDF)
+_CATEGORY_HEADER_HEIGHT = 18  # header + margins
+_SPEC_ROW_HEIGHT = 18  # label + value + padding
 
 
 def _estimate_section_height(section) -> float:

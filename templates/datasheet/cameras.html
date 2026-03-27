@@ -219,8 +219,8 @@ body {
     font-weight: 500;
     font-size: 14pt;
     color: #03a9f4;
-    padding-top: 30pt;
-    margin-bottom: 20pt;
+    padding-top: 24pt;
+    margin-bottom: 14pt;
 }
 
 .spec-columns {
@@ -247,10 +247,10 @@ body {
     background: #6d7781;
     color: white;
     font-weight: 500;
-    font-size: 8pt;
-    padding: 3pt 6pt;
-    margin-top: 10pt;
-    margin-bottom: 4pt;
+    font-size: 7.5pt;
+    padding: 2.5pt 6pt;
+    margin-top: 6pt;
+    margin-bottom: 2pt;
 }
 
 .spec-category-header:first-child {
@@ -259,7 +259,7 @@ body {
 
 .spec-row {
     border-bottom: 0.5pt solid #bcbec0;
-    padding: 3pt 0;
+    padding: 2pt 0;
 }
 
 .spec-label {
@@ -420,11 +420,7 @@ body {
 <div class="page">
     <div class="top-bar"></div>
     <div class="spec-page">
-        {% if loop.first %}
         <div class="spec-page-title">Technical Specifications</div>
-        {% else %}
-        <div class="spec-page-title">Technical Specifications (cont.)</div>
-        {% endif %}
 
         <div class="spec-columns">
             <div class="spec-col">
