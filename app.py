@@ -4,7 +4,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, Response
 
 from config import BASE_DIR, OUTPUT_DIR, WEB_TEMPLATE_DIR
-from services.data_loader import load_product, list_available_products
+from services.data_loader import load_product, list_available_products, get_product_lines
 from services.pdf_generator import render_html
 from services.version_manager import (
     get_current_version, get_history,
@@ -23,23 +23,26 @@ app.secret_key = os.environ.get("APP_SECRET", "dev-secret-key")
 def dashboard():
     products = list_available_products()
     versions = get_all_products()
+    product_lines = get_product_lines()
 
-    product_details = {}
-    for model_name in products:
-        try:
-            p = load_product(model_name)
-            product_details[model_name] = {
-                "product_line": p.product_line,
-                "category": p.category,
-            }
-        except Exception:
-            product_details[model_name] = {}
+    # Group products by product_line
+    grouped = {}
+    for p in products:
+        line = p.get("product_line", "Other")
+        if line not in grouped:
+            grouped[line] = []
+        grouped[line].append(p)
+
+    # Active tab from query param
+    active_tab = request.args.get("tab", product_lines[0] if product_lines else "All")
 
     return render_template(
         "web/dashboard.html",
         products=products,
+        grouped=grouped,
         versions=versions,
-        product_details=product_details,
+        product_lines=product_lines,
+        active_tab=active_tab,
     )
 
 
