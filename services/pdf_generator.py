@@ -137,7 +137,7 @@ def render_html(product: ProductBase, version: str, template_name: str = None) -
     product_url = f"https://www.engeniustech.com/engenius-cloud/{product.model_name.lower()}"
     qr_code_url = (
         f"https://api.qrserver.com/v1/create-qr-code/"
-        f"?size=150x150&data={product_url}"
+        f"?size=150x150&bgcolor=EFF0F2&data={product_url}"
     )
 
     html = template.render(
