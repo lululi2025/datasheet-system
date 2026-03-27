@@ -102,7 +102,11 @@ def _balance_columns(sections: list) -> dict:
 def render_html(product: ProductBase, version: str, template_name: str = None) -> str:
     """Render product data into HTML string with URL-based image paths."""
     if template_name is None:
-        template_name = f"{product.category.lower()}.html"
+        # Map category to template file; fall back to cameras.html (generic layout)
+        category_templates = {
+            "cameras": "cameras.html",
+        }
+        template_name = category_templates.get(product.category.lower(), "cameras.html")
 
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template(template_name)
