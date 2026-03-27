@@ -37,7 +37,17 @@ body {
     page-break-after: avoid;
 }
 
-/* ===== TOP BAR (all pages) ===== */
+/* ===== BOTTOM BAR (all pages) ===== */
+.bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 42pt;
+    background: #03a9f4;
+}
+
+/* ===== TOP BAR ===== */
 .top-bar {
     background: #03a9f4;
     height: 21pt;
@@ -53,7 +63,7 @@ body {
 
 .top-bar-full .logo-img {
     position: absolute;
-    left: 36pt;
+    left: 35pt;
     top: 50%;
     transform: translateY(-50%);
     height: 46pt;
@@ -61,7 +71,7 @@ body {
 
 .top-bar-full .title-area {
     position: absolute;
-    right: 27pt;
+    right: 35pt;
     top: 44pt;
 }
 
@@ -77,10 +87,20 @@ body {
     color: white;
 }
 
+/* Page number — inside bottom bar */
+.page-number {
+    position: absolute;
+    right: 35pt;
+    bottom: 16pt;
+    font-weight: 300;
+    font-size: 7pt;
+    color: rgba(255,255,255,0.85);
+}
+
 /* ===== PAGE 1: COVER ===== */
 .cloud-icon {
     position: absolute;
-    left: 36pt;
+    left: 35pt;
     top: 140pt;
     width: 87pt;
     height: 85pt;
@@ -88,7 +108,7 @@ body {
 
 .model-name {
     position: absolute;
-    right: 27pt;
+    right: 35pt;
     top: 104pt;
     font-weight: 500;
     font-size: 12pt;
@@ -112,7 +132,7 @@ body {
     font-size: 24pt;
     color: #231f20;
     line-height: 1.3;
-    right: 36pt;
+    right: 35pt;
 }
 
 .product-image-container {
@@ -140,7 +160,7 @@ body {
 
 .overview-section {
     position: absolute;
-    left: 36pt;
+    left: 35pt;
     top: 270pt;
     width: 270pt;
 }
@@ -155,9 +175,9 @@ body {
 /* Features section */
 .features-wrapper {
     position: absolute;
-    left: 36pt;
-    right: 36pt;
-    bottom: 36pt;
+    left: 35pt;
+    right: 35pt;
+    bottom: 56pt; /* 42pt bottom bar + 14pt spacing */
 }
 
 .features-title {
@@ -199,27 +219,19 @@ body {
     color: #4a4a4a;
 }
 
-/* Page number */
-.page-number {
-    position: absolute;
-    right: 23pt;
-    bottom: 18pt;
-    font-weight: 300;
-    font-size: 7pt;
-    color: #6f7073;
-}
-
 /* ===== PAGE 2+: SPEC TABLE ===== */
 .spec-page {
-    padding: 36pt;
+    padding-left: 35pt;
+    padding-right: 35pt;
     padding-top: 0;
+    padding-bottom: 0;
 }
 
 .spec-page-title {
     font-weight: 500;
     font-size: 14pt;
     color: #03a9f4;
-    padding-top: 24pt;
+    padding-top: 31pt; /* 21pt bar + 31pt = 52pt from top */
     margin-bottom: 14pt;
 }
 
@@ -236,11 +248,11 @@ body {
 }
 
 .spec-col:first-child {
-    padding-right: 18pt;
+    padding-right: 15pt; /* half of 30pt gap */
 }
 
 .spec-col:last-child {
-    padding-left: 18pt;
+    padding-left: 15pt; /* half of 30pt gap */
 }
 
 .spec-category-header {
@@ -275,9 +287,10 @@ body {
     margin-top: 1pt;
 }
 
-/* ===== PAGE 3: HARDWARE OVERVIEW ===== */
+/* ===== HARDWARE OVERVIEW PAGE ===== */
 .hardware-page {
-    padding: 36pt;
+    padding-left: 35pt;
+    padding-right: 35pt;
     padding-top: 0;
 }
 
@@ -285,31 +298,29 @@ body {
     font-weight: 500;
     font-size: 14pt;
     color: #03a9f4;
-    padding-top: 32pt;
+    padding-top: 31pt; /* 21pt bar + 31pt = 52pt from top */
     margin-bottom: 16pt;
 }
 
 .hardware-image-container {
     text-align: center;
-    margin: 20pt auto;
+    margin: 10pt auto;
 }
 
 .hardware-image-container img {
-    max-width: 480pt;
-    max-height: 420pt;
+    max-width: 530pt;
+    max-height: 480pt;
     object-fit: contain;
 }
 
-
-/* Footer */
+/* ===== FOOTER ===== */
 .footer {
     position: absolute;
-    bottom: 0;
+    bottom: 42pt; /* above bottom bar */
     left: 0;
     right: 0;
     background: #eff0f2;
-    padding: 16pt 36pt 20pt 36pt;
-    border-top: 0.5pt solid #bcbec0;
+    padding: 14pt 35pt 14pt 35pt;
 }
 
 .footer-content {
@@ -326,7 +337,7 @@ body {
 .footer-right {
     display: table-cell;
     vertical-align: top;
-    width: 60pt;
+    width: 75pt;
     text-align: center;
 }
 
@@ -335,8 +346,7 @@ body {
 }
 
 .footer-logo img {
-    height: 30pt;
-    opacity: 0.55;
+    height: 28pt;
 }
 
 .footer-disclaimer {
@@ -355,7 +365,7 @@ body {
 
 .footer-qr {
     background: white;
-    padding: 5pt;
+    padding: 6pt;
     display: inline-block;
 }
 
@@ -420,6 +430,7 @@ body {
         </div>
     </div>
 
+    <div class="bottom-bar"></div>
     <div class="page-number">1</div>
 </div>
 
@@ -455,11 +466,12 @@ body {
             </div>
         </div>
     </div>
+    <div class="bottom-bar"></div>
     <div class="page-number">{{ loop.index + 1 }}</div>
 </div>
 {% endfor %}
 
-<!-- ==================== PAGE 3: HARDWARE OVERVIEW ==================== -->
+<!-- ==================== HARDWARE OVERVIEW ==================== -->
 <div class="page">
     <div class="top-bar"></div>
     <div class="hardware-page">
@@ -470,14 +482,12 @@ body {
             <img src="{{ product.hardware_image }}" alt="Hardware Overview">
         </div>
         {% endif %}
-
-        {# Hardware labels are already included in the hardware image with callout lines #}
     </div>
 
     <div class="footer">
         <div class="footer-content">
             <div class="footer-left">
-                <div class="footer-logo"><img src="/static/logo/EnGenius-Logo-black.png" alt="EnGenius®"></div>
+                <div class="footer-logo"><img src="/static/logo/EnGenius-Logo-gray.png" alt="EnGenius®"></div>
                 <div class="footer-disclaimer">
                     Features and specifications subject to change without notice. Trademarks and registered trademarks are the property of their respective owners. These limits are designed to provide reasonable
                     protection against harmful interference in a residential installation. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the
@@ -496,6 +506,7 @@ body {
         </div>
     </div>
 
+    <div class="bottom-bar"></div>
     <div class="page-number">{{ spec_pages|length + 2 }}</div>
 </div>
 
