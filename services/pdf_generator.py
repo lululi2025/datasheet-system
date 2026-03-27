@@ -12,12 +12,12 @@ from services.drive_images import get_image_urls
 _PAGE_HEIGHT = 792
 _TOP_BAR_HEIGHT = 21
 _SPEC_TITLE_HEIGHT = 50  # title + margin
-_BOTTOM_MARGIN = 50  # page number + safety margin
+_BOTTOM_MARGIN = 60  # page number + safety margin
 _AVAILABLE_HEIGHT = _PAGE_HEIGHT - _TOP_BAR_HEIGHT - _SPEC_TITLE_HEIGHT - _BOTTOM_MARGIN
 
-# Per-item height estimates
-_CATEGORY_HEADER_HEIGHT = 24  # header + margins
-_SPEC_ROW_HEIGHT = 20  # label + value + padding
+# Per-item height estimates (conservative to account for text wrapping)
+_CATEGORY_HEADER_HEIGHT = 28  # header + margins
+_SPEC_ROW_HEIGHT = 28  # label + value + padding (some values wrap to 2 lines)
 
 
 def _estimate_section_height(section) -> float:
