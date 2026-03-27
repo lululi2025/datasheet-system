@@ -16,13 +16,23 @@ from models.base import ProductBase
 
 # Known spec category headers — rows with empty values act as section dividers
 SPEC_CATEGORIES = {
+    # Camera
     "Optics", "Video", "Audio", "Advanced AI Analytics",
     "Storage", "System", "Mechanical", "Management Software",
+    # Common
     "General", "Physical", "Interface", "Networking", "Network",
     "Wireless", "Radio", "Performance", "Power", "Environment",
-    "Environmental", "Software", "Security", "Layer 2 Features",
-    "Layer 3 Features", "Management", "Standards", "Certifications",
+    "Environmental", "Software", "Security",
+    "Management", "Standards", "Certifications",
     "PoE", "Switching", "Ports", "Port", "LED",
+    # Switch
+    "Physical Interface", "L2 Software Features", "L3 Software Features",
+    "Common L2 Features", "Environmental & Physical",
+    "Device Dimensions & Weight", "Device Dimensions & Weights",
+    "Layer 2 Features", "Layer 3 Features",
+    # AP
+    "Radio Specifications", "Antenna", "Physical/Electrical",
+    "Regulatory Information", "Package Contents",
 }
 
 # Hardware labels per model (not in sheet, define here for now)
@@ -91,7 +101,7 @@ def _get_cell(row: list[str], col_idx: int) -> str:
 def _parse_spec_sections(rows: list[list[str]], col_idx: int) -> list[SpecSection]:
     """Parse technical specification sections from the Detail Specs tab."""
     sections = []
-    current_category = None
+    current_category = "General"  # Default category for items before first header
     current_items = []
 
     # Find where "Technical Specifications" starts
@@ -108,8 +118,20 @@ def _parse_spec_sections(rows: list[list[str]], col_idx: int) -> list[SpecSectio
         if not label:
             continue
 
-        # Check if this is a category header
-        if label in SPEC_CATEGORIES:
+        # Check if this is a category header:
+        # 1. Exact match in known set, OR
+        # 2. Has a label but ALL model columns are empty (section divider row)
+        is_category = label in SPEC_CATEGORIES
+        if not is_category and label and not value:
+            # Check if all data columns are empty (skip col 0 which is the label)
+            all_empty = all(
+                not _get_cell(row, c).strip() or _get_cell(row, c).strip() == "-"
+                for c in range(1, min(len(row), 10))
+            )
+            if all_empty:
+                is_category = True
+
+        if is_category:
             if current_category and current_items:
                 sections.append(SpecSection(category=current_category, items=current_items))
             current_category = label
@@ -120,8 +142,7 @@ def _parse_spec_sections(rows: list[list[str]], col_idx: int) -> list[SpecSectio
         if not value or value == "-":
             continue
 
-        if current_category:
-            current_items.append(SpecItem(label=label, value=value))
+        current_items.append(SpecItem(label=label, value=value))
 
     if current_category and current_items:
         sections.append(SpecSection(category=current_category, items=current_items))
@@ -142,15 +163,21 @@ def _parse_overview_data(rows: list[list[str]], col_idx: int) -> dict:
         label = row[0].strip() if row else ""
         row_map[label] = i
 
-    # Model Description
-    for label in ["Model Description"]:
-        if label in row_map:
-            data["model_description"] = _get_cell(rows[row_map[label]], col_idx)
+    # Model Description — different sheets use different labels
+    for label_key in ["Model Description", "Excerpt\n(Headline)", "Excerpt"]:
+        for stored_label, idx in row_map.items():
+            if label_key in stored_label:
+                val = _get_cell(rows[idx], col_idx)
+                if val:
+                    data["model_description"] = val
+                    break
+        if data["model_description"]:
+            break
 
-    # Overview — use "Single Overview" (MKT rewrite) if available
+    # Overview — use "Single Overview" or "Highlights/Single Overview" (MKT rewrite)
     for row in rows:
         label = row[0].strip() if row else ""
-        if "Single Overview" in label:
+        if "Single Overview" in label or "Highlights/Single Overview" in label:
             val = _get_cell(row, col_idx)
             if val:
                 data["overview"] = val
@@ -164,7 +191,8 @@ def _parse_overview_data(rows: list[list[str]], col_idx: int) -> dict:
                     data["overview"] = val
                     break
 
-    # Features — may be in a single cell with newline-separated "* " entries
+    # Features — may be in a single cell with newline-separated entries
+    # Formats: "* feature", "- feature", or just "feature" per line
     for row in rows:
         label = row[0].strip() if row else ""
         if "Key Feature Lists" in label or "Key Feature" in label:
@@ -172,10 +200,12 @@ def _parse_overview_data(rows: list[list[str]], col_idx: int) -> dict:
             if cell_value:
                 for line in cell_value.split("\n"):
                     line = line.strip()
-                    if line.startswith("*"):
-                        feature_text = line.lstrip("* ").strip()
-                        if feature_text:
-                            data["features"].append(feature_text)
+                    if not line:
+                        continue
+                    # Strip leading bullet markers
+                    feature_text = line.lstrip("*-•● ").strip()
+                    if feature_text and len(feature_text) > 5:
+                        data["features"].append(feature_text)
             if data["features"]:
                 break
 
