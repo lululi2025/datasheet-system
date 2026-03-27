@@ -1,6 +1,6 @@
 # CLAUDE.md — Project Context
 
-> Last updated: 2026-03-26 (session 2)
+> Last updated: 2026-03-27 (session 4)
 
 ## Project Overview
 
@@ -38,12 +38,19 @@ Template PDF/       # 設計師原始 PDF 範本（供比對用，不進 git）
 
 ## Key Config
 
-- **Google Sheet ID**: `1jQUW9vvqzWEx-pMfPtSxUhf-Ov81cQzzSx16-YX1wqU`
-- **Detail Specs GID**: `180970413`
-- **Web Overview GID**: `2086236498`
 - **Brand colors**: primary blue `#03a9f4`, dark `#231f20`, gray `#6f6f6f`
 - **Font**: Roboto (300, 400, 500)
 - **Page size**: US Letter (612x792pt)
+
+### 多產品線 Google Sheets（每條產品線一個獨立試算表）
+
+| 產品線 | Sheet ID | Category |
+|--------|----------|----------|
+| Cloud Camera | `1jQUW9vvqzWEx-pMfPtSxUhf-Ov81cQzzSx16-YX1wqU` | Cameras |
+| Cloud AP | `1WFQHS8LnjzIrAJa-Fih3qWCFICagbCQE9jML-ziwUwM` | APs |
+| Cloud Switch | `1FkKUH-heE2VwlBsHo1XdPqW1MsQCT27JmFWlVV-Mwjk` | Switches |
+
+每個 Sheet 都有 `Detail Specs` + `Web Overview` 兩個 tab，GID 設定在 `config.py` 的 `PRODUCT_LINES`。
 
 ## Deployment
 
@@ -66,18 +73,25 @@ vercel deploy --prod --yes
 ### ✅ Completed
 
 - ECC100 Camera datasheet 版型（3頁：封面、規格表、硬體概覽）
-- Google Sheets 讀取模組（Detail Specs + Web Overview 兩個 tab）
+- **多產品線支援** — Camera / AP / Switch 三條產品線，前台 Dashboard 有分頁籤
+- Google Sheets 讀取模組（每條產品線獨立 Sheet，各有 Detail Specs + Web Overview tab）
+- **Switch/AP 解析修正** — 不同 Sheet 格式（category headers、features 用 `- ` 或純文字、欄位名稱差異）
 - Flask Web UI（Dashboard + Product 頁面 + HTML Preview）
 - Save as PDF 功能（product 頁面按鈕，透過隱藏 iframe 觸發列印）
 - Vercel 部署 + GitHub auto-deploy
 - Version management 模組（本地用）
+- Google Drive API 串接（Service Account，從共用 Drive 讀取產品圖片）
+- 產品圖片自動裁切透明邊距（Pillow getbbox）
+- QR Code 動態生成（連結到官網產品頁）
+- 規格表自動分頁（內容超過一頁時自動換頁）
+- PDF 模板色值提取與校正（PyMuPDF + Pillow 像素取樣）
+- UTF-8 encoding 修正（Google Sheets CSV 的 `°` `″` 亂碼）
 
 ### ⚠️ Pending / Known Issues
 
-- **Features parsing 可能有問題** — Google Sheets 的 Key Feature Lists 是單一 cell 內 `\n* ` 分隔，已寫好解析邏輯但尚未完整驗證
-- **Google Drive 圖片串接** — 決定用 Google Drive API + API Key 自動抓圖。需要到 Google Cloud Console 建專案、啟用 Drive API、建立 API Key。圖片命名規則：`{型號}_product.png`（產品照）、`{型號}_hardware.png`（硬體圖）
-- **PDF 輸出方式待改** — 目前用瀏覽器列印存 PDF，但跟 HTML 預覽有差異（邊距、背景色、分頁）。計畫改用 **html2pdf.js**（客戶端截圖式，視覺完全一致，免費，不需換平台）
-- **其他產品線模板** — 目前只有 Camera，還需要 Switch、Access Point 等
+- **PDF ≠ HTML 預覽** — 瀏覽器列印會加邊距、吃掉背景色，計畫改用 html2pdf.js 或外部 PDF API
+- **Google Drive 圖片未完成** — 需要 Service Account key 或 API Key 才能自動抓圖，目前僅 ECC100/ECC120 有設定 folder ID
+- **所有產品線共用 cameras.html 模板** — 目前 fallback 到 cameras.html，尚未為 Switch/AP 建立專用模板
 - **Vercel 上無法 server-side 生成 PDF** — WeasyPrint 需要原生 C 函式庫，Vercel 不支援
 
 ## 替代方案筆記
@@ -91,15 +105,41 @@ vercel deploy --prod --yes
 - **外部 PDF API**（如 PDFShift, DocRaptor）— 最精確，但有成本
 - **換部署平台** — Railway / Fly.io / Google Cloud Run 支援 Docker，可跑 WeasyPrint 或 Playwright
 
+## PDF 模板比對方法論
+
+1. **提取精確數值** — 用 PyMuPDF + Pillow 掃描 PDF 像素，`pixel / dpi * 72 = pt`
+2. **顏色用像素取樣** — 不能猜，必須從 PDF 取得精確 RGB hex
+3. **圖片只設一個維度** — `<img>` 只設 width 或 height，另一個 auto，避免變形
+4. **透明邊距先裁掉** — Logo/icon 有透明邊距會導致對齊偏移，用 `Pillow getbbox()` 裁切
+5. **從 PDF 提取 logo** — 尺寸顏色 100% 正確，優於用戶另外提供或 CSS 縮放
+6. **不確定時先提方案** — 列出 2-3 個選項（含優缺點）讓用戶選，不要猜測執行
+
+### 已驗證的參考色值
+| 元素 | Hex |
+|---|---|
+| 藍色 top bar | `#02a8f4` |
+| 規格分類標題背景 | `#6d7781` |
+| Features 區塊底色 | `#ebf8fe` |
+| Footer 底色 | `#eff0f2` |
+| 規格分隔線 | `#bcbec0` |
+
 ## Common Pitfalls
 
-- **WeasyPrint 在 macOS 需要 Homebrew Python** — 系統 Python 3.9 因 SIP 限制無法載入 `libgobject`，必須用 `.venv/bin/python`（Homebrew Python 3.14）
-- **Git commit author 要對應 GitHub 帳號** — 否則 Vercel GitHub integration 會 block deployment。用 `194753981+lululi2025@users.noreply.github.com`
-- **Template 命名是 category 的小寫** — `CameraProduct.category = "Cameras"` → template 檔名是 `cameras.html`（注意複數）
-- **Google Sheets features 在單一 cell** — 不是多行，是一個 cell 裡用 `\n* ` 分隔，解析時要 split
+- **不要猜顏色** — 必須用 PyMuPDF 像素取樣，之前猜 `#231f20`（黑）實際是 `#6d7781`（灰藍）
+- **圖片不要同時設 width + height** — 會造成變形（cloud icon 踩過），只設一個維度
+- **Logo 透明邊距會導致對齊偏移** — 必須先裁掉透明邊距再對齊
+- **不要改動已經正確的元素** — 調 padding 時不小心改了 header logo 位置，多做少錯
+- **底部沒有藍條** — PDF 標注的 42px 是底部邊距，不是藍條
+- **QR code 白底要超出 QR 本身** — 參考 PDF 是白色方塊（~4pt padding）內嵌 QR
+- **WeasyPrint 在 macOS 需要 Homebrew Python** — 必須用 `.venv/bin/python`（Homebrew Python 3.14）
+- **Git commit author 要對應 GitHub 帳號** — 用 `194753981+lululi2025@users.noreply.github.com`
+- **Template 命名是 category 的小寫** — `CameraProduct.category = "Cameras"` → `cameras.html`
+- **Google Sheets features 格式不統一** — Camera 用 `* `、Switch 用 `- `、AP 純文字換行，解析時都要處理
+- **不同 Sheet 的欄位名稱不同** — Camera 有 "Model Description"，Switch/AP 用 "Excerpt"；Overview 欄位名也不同
+- **Switch Sheet 的 category header 是空值行** — 不像 Camera 有明確的 category 名稱，Switch 用空值行當分隔線
 - **專案路徑有空格** — `/Users/lulu/AI Project/Datasheet System/`，指令要加引號
-- **Google Drive MCP 工具只能搜資料夾和 Google Docs** — 無法搜尋/讀取圖片檔（PNG/JPG），需用 Drive API 或請使用者提供分享連結
-- **Vercel deploy blocked by unknown committer** — Git commit email 必須對應 GitHub 帳號，用 `194753981+lululi2025@users.noreply.github.com`；或用 `vercel deploy --prod --yes` CLI 直接部署繞過
+- **Google Drive MCP 工具只能搜資料夾和 Google Docs** — 圖片檔需用 Drive API
+- **Vercel deploy blocked by unknown committer** — 用 `vercel deploy --prod --yes` CLI 繞過
 
 ## Google Drive 圖片資料夾結構
 
