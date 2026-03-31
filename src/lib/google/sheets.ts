@@ -1,0 +1,341 @@
+import { google } from "googleapis";
+import { getGoogleAuth } from "./auth";
+
+/**
+ * Known spec category headers — rows where column A is a category name.
+ * Matches the Python SPEC_CATEGORIES set from the old project.
+ */
+const SPEC_CATEGORIES = new Set([
+  "Optics", "Video", "Audio", "Advanced AI Analytics",
+  "Storage", "System", "Mechanical", "Management Software",
+  "General", "Physical", "Interface", "Networking", "Network",
+  "Wireless", "Radio", "Performance", "Power", "Environment",
+  "Environmental", "Software", "Security", "Layer 2 Features",
+  "Layer 3 Features", "Management", "Standards", "Certifications",
+  "PoE", "Switching", "Ports", "Port", "LED",
+]);
+
+export interface SheetSpecItem {
+  label: string;
+  value: string;
+}
+
+export interface SheetSpecSection {
+  category: string;
+  items: SheetSpecItem[];
+}
+
+export interface SheetProduct {
+  model_name: string;
+  subtitle: string;
+  full_name: string;
+  overview: string;
+  features: string[];
+  spec_sections: SheetSpecSection[];
+}
+
+export interface SheetMetadata {
+  last_modified: string | null;
+  last_editor: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function getCell(row: string[] | undefined, colIdx: number): string {
+  if (!row || colIdx >= row.length) return "";
+  return (row[colIdx] ?? "").trim();
+}
+
+function findModelColumn(rows: string[][], modelNumber: string): number | null {
+  for (let r = 0; r < Math.min(rows.length, 5); r++) {
+    for (let c = 0; c < rows[r].length; c++) {
+      if (rows[r][c].trim() === modelNumber) return c;
+    }
+  }
+  return null;
+}
+
+function findRowByLabel(rows: string[][], label: string): number | null {
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i]?.[0]?.trim() === label) return i;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Parse spec sections from Detail Specs tab
+// ---------------------------------------------------------------------------
+
+function parseSpecSections(rows: string[][], colIdx: number): SheetSpecSection[] {
+  const sections: SheetSpecSection[] = [];
+  let currentCategory: string | null = null;
+  let currentItems: SheetSpecItem[] = [];
+
+  // Find where "Technical Specifications" starts
+  let startRow = 0;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i]?.[0]?.trim() === "Technical Specifications") {
+      startRow = i + 1;
+      break;
+    }
+  }
+
+  for (let i = startRow; i < rows.length; i++) {
+    const label = rows[i]?.[0]?.trim() ?? "";
+    const value = getCell(rows[i], colIdx);
+
+    if (!label) continue;
+
+    if (SPEC_CATEGORIES.has(label)) {
+      if (currentCategory && currentItems.length > 0) {
+        sections.push({ category: currentCategory, items: currentItems });
+      }
+      currentCategory = label;
+      currentItems = [];
+      continue;
+    }
+
+    if (!value || value === "-") continue;
+
+    if (currentCategory) {
+      currentItems.push({ label, value });
+    }
+  }
+
+  if (currentCategory && currentItems.length > 0) {
+    sections.push({ category: currentCategory, items: currentItems });
+  }
+
+  return sections;
+}
+
+// ---------------------------------------------------------------------------
+// Parse overview data from Web Overview tab
+// ---------------------------------------------------------------------------
+
+function parseOverviewData(
+  rows: string[][],
+  colIdx: number
+): { full_name: string; overview: string; features: string[] } {
+  let full_name = "";
+  let overview = "";
+  const features: string[] = [];
+
+  // Build label → row index map
+  const rowMap = new Map<string, number>();
+  for (let i = 0; i < rows.length; i++) {
+    const label = rows[i]?.[0]?.trim() ?? "";
+    if (label) rowMap.set(label, i);
+  }
+
+  // Model Description
+  const descIdx = rowMap.get("Model Description");
+  if (descIdx !== undefined) {
+    full_name = getCell(rows[descIdx], colIdx);
+  }
+
+  // Overview — prefer "Single Overview" (MKT rewrite)
+  for (const row of rows) {
+    const label = row?.[0]?.trim() ?? "";
+    if (label.includes("Single Overview")) {
+      const val = getCell(row, colIdx);
+      if (val) { overview = val; break; }
+    }
+  }
+  if (!overview) {
+    for (const row of rows) {
+      const label = row?.[0]?.trim() ?? "";
+      if (label.includes("Overview") && !label.includes("Single")) {
+        const val = getCell(row, colIdx);
+        if (val) { overview = val; break; }
+      }
+    }
+  }
+
+  // Features — single cell with newline-separated "* " entries
+  for (const row of rows) {
+    const label = row?.[0]?.trim() ?? "";
+    if (label.includes("Key Feature Lists") || label.includes("Key Feature")) {
+      const cellValue = getCell(row, colIdx);
+      if (cellValue) {
+        for (const line of cellValue.split("\n")) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("*")) {
+            const text = trimmed.replace(/^\*\s*/, "").trim();
+            if (text) features.push(text);
+          }
+        }
+      }
+      if (features.length > 0) break;
+    }
+  }
+
+  // Fallback: features spread across multiple rows
+  if (features.length === 0) {
+    let inFeatures = false;
+    for (const row of rows) {
+      const label = row?.[0]?.trim() ?? "";
+      if (label.includes("Key Feature Lists")) { inFeatures = true; continue; }
+      if (inFeatures) {
+        if (label.startsWith("*")) {
+          let text = getCell(row, colIdx) || label;
+          text = text.replace(/^\*\s*/, "").trim();
+          if (text) features.push(text);
+        } else if (label) {
+          inFeatures = false;
+        }
+      }
+    }
+  }
+
+  return { full_name, overview, features };
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Get sheet metadata (last modified time, last editor) using Drive API.
+ */
+export async function getSheetMetadata(sheetId: string): Promise<SheetMetadata> {
+  const auth = getGoogleAuth();
+  const drive = google.drive({ version: "v3", auth });
+
+  const res = await drive.files.get({
+    fileId: sheetId,
+    fields: "modifiedTime,lastModifyingUser",
+  });
+
+  return {
+    last_modified: res.data.modifiedTime ?? null,
+    last_editor: res.data.lastModifyingUser?.emailAddress ?? null,
+  };
+}
+
+/**
+ * List all model numbers from a sheet's Detail Specs tab.
+ */
+export async function listModelsFromSheet(
+  sheetId: string,
+  detailSpecsGid: string
+): Promise<{ model_name: string; subtitle: string }[]> {
+  const auth = getGoogleAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Get all sheet names to find the one matching the GID
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId: sheetId,
+    fields: "sheets.properties",
+  });
+
+  const targetSheet = meta.data.sheets?.find(
+    (s) => String(s.properties?.sheetId) === detailSpecsGid
+  );
+  const sheetName = targetSheet?.properties?.title ?? "Detail Specs";
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `'${sheetName}'`,
+    valueRenderOption: "UNFORMATTED_VALUE",
+  });
+
+  const rows = (res.data.values ?? []) as string[][];
+  if (rows.length < 2) return [];
+
+  // Find "Model #" row and "Model Name" row
+  const numRowIdx = findRowByLabel(rows, "Model #") ?? 2;
+  const nameRowIdx = findRowByLabel(rows, "Model Name") ?? 0;
+  const modelNumRow = rows[numRowIdx] ?? [];
+
+  const models: { model_name: string; subtitle: string }[] = [];
+
+  for (let col = 1; col < modelNumRow.length; col++) {
+    const modelNum = String(modelNumRow[col] ?? "").trim();
+    const modelName = getCell(rows[nameRowIdx], col);
+
+    if (!modelNum || modelName.includes("Vivotek")) continue;
+
+    models.push({ model_name: modelNum, subtitle: modelName });
+  }
+
+  return models;
+}
+
+/**
+ * Load full product data for a specific model from Google Sheets.
+ */
+export async function loadProductFromSheets(
+  sheetId: string,
+  detailSpecsGid: string,
+  overviewGid: string,
+  modelNumber: string
+): Promise<SheetProduct | null> {
+  const auth = getGoogleAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Get sheet names
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId: sheetId,
+    fields: "sheets.properties",
+  });
+
+  const sheetsList = meta.data.sheets ?? [];
+  const detailSheet = sheetsList.find(
+    (s) => String(s.properties?.sheetId) === detailSpecsGid
+  );
+  const overviewSheet = sheetsList.find(
+    (s) => String(s.properties?.sheetId) === overviewGid
+  );
+
+  const detailName = detailSheet?.properties?.title ?? "Detail Specs";
+  const overviewName = overviewSheet?.properties?.title ?? "Web Overview";
+
+  // Fetch both tabs in parallel
+  const [detailRes, overviewRes] = await Promise.all([
+    sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `'${detailName}'`,
+      valueRenderOption: "UNFORMATTED_VALUE",
+    }),
+    sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `'${overviewName}'`,
+      valueRenderOption: "UNFORMATTED_VALUE",
+    }),
+  ]);
+
+  const detailRows = (detailRes.data.values ?? []) as string[][];
+  const overviewRows = (overviewRes.data.values ?? []) as string[][];
+
+  // Find model column in detail tab
+  const detailCol = findModelColumn(detailRows, modelNumber);
+  if (detailCol === null) return null;
+
+  // Find model column in overview tab
+  const overviewCol = findModelColumn(overviewRows, modelNumber);
+
+  // Parse subtitle from "Model Name" row
+  const nameRowIdx = findRowByLabel(detailRows, "Model Name") ?? 0;
+  const subtitle = getCell(detailRows[nameRowIdx], detailCol);
+
+  // Parse specs
+  const spec_sections = parseSpecSections(detailRows, detailCol);
+
+  // Parse overview
+  let overviewData = { full_name: "", overview: "", features: [] as string[] };
+  if (overviewCol !== null) {
+    overviewData = parseOverviewData(overviewRows, overviewCol);
+  }
+
+  return {
+    model_name: modelNumber,
+    subtitle,
+    full_name: overviewData.full_name || subtitle,
+    overview: overviewData.overview,
+    features: overviewData.features,
+    spec_sections,
+  };
+}
