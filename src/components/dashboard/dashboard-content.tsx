@@ -254,18 +254,8 @@ export function DashboardContent({
         <button
           onClick={handleSync}
           disabled={syncing}
-          className="inline-flex items-center gap-1.5 rounded-md bg-engenius-blue px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-engenius-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-1 text-sm font-medium text-engenius-blue hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg
-            className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M1.5 8a6.5 6.5 0 0 1 11.25-4.5M14.5 8a6.5 6.5 0 0 1-11.25 4.5" />
-            <path d="M13.5 1v3.5H10M2.5 15v-3.5H6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
           {syncing ? "Syncing..." : "Sync from Sheets"}
         </button>
       </div>
