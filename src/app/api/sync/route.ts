@@ -63,7 +63,6 @@ export async function POST(request: Request) {
     synced: string[];
     errors: string[];
     skipped?: boolean;
-    debug?: { sheetModified: string | null; lastSynced: string | null };
   }[] = [];
 
   // Collect changes for notifications
@@ -73,10 +72,6 @@ export async function POST(request: Request) {
     if (!pl.sheet_id || !pl.detail_specs_gid) continue;
 
     const lineResult: typeof results[number] = { line: pl.name, synced: [], errors: [] };
-    let lineDebug: { sheetModified: string | null; lastSynced: string | null } = {
-      sheetModified: null,
-      lastSynced: pl.last_synced_at ?? null,
-    };
 
     try {
       // Get sheet metadata (last modified, last editor) — uses Drive API
@@ -86,22 +81,13 @@ export async function POST(request: Request) {
       };
       try {
         metadata = await getSheetMetadata(pl.sheet_id);
-      } catch (driveErr) {
+      } catch {
         // Drive API not available — Smart Sync won't work, fall through to full sync
-        lineResult.errors.push(
-          `Drive API: ${driveErr instanceof Error ? driveErr.message : String(driveErr)}`
-        );
       }
 
       // Smart Sync: skip if sheet hasn't changed since last sync
       const sheetModified = metadata.last_modified ? new Date(metadata.last_modified).getTime() : null;
       const lastSynced = pl.last_synced_at ? new Date(pl.last_synced_at).getTime() : null;
-
-      lineDebug = {
-        sheetModified: metadata.last_modified,
-        lastSynced: pl.last_synced_at ?? null,
-      };
-      const debugInfo = lineDebug;
 
       if (
         !forceSync &&
@@ -110,7 +96,7 @@ export async function POST(request: Request) {
         lastSynced !== null &&
         sheetModified <= lastSynced
       ) {
-        results.push({ line: pl.name, synced: [], errors: [], skipped: true, debug: debugInfo });
+        results.push({ line: pl.name, synced: [], errors: [], skipped: true });
         continue;
       }
 
@@ -411,7 +397,6 @@ export async function POST(request: Request) {
       .update({ last_synced_at: new Date().toISOString() })
       .eq("id", pl.id);
 
-    lineResult.debug = lineDebug;
     results.push(lineResult);
   }
 
