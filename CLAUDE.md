@@ -1,6 +1,6 @@
 # CLAUDE.md — Project Context
 
-> Last updated: 2026-03-31
+> Last updated: 2026-04-01
 
 ## Project Overview
 
@@ -38,6 +38,8 @@ src/
       dashboard/loading.tsx    # Skeleton loading state
       compare/[line]/page.tsx  # Spec comparison (TanStack Table)
       changelog/[line]/page.tsx # Sync change logs + revision log
+      product/[model]/page.tsx  # Product detail (images, overview, specs, versions)
+      docs/sync/page.tsx        # Sync & notification guide (native JSX, no markdown)
     (print)/                   # Route group: no Navbar, for PDF
       preview/[model]/page.tsx # Datasheet HTML preview → Save as PDF
     api/sync/route.ts          # Google Sheets → Supabase sync
@@ -45,7 +47,8 @@ src/
     api/upload-image/route.ts  # Image upload to Supabase Storage
   components/
     compare/compare-table.tsx  # TanStack Table with search, sort, column toggle
-    dashboard/dashboard-content.tsx
+    dashboard/dashboard-content.tsx  # Tabs, product table, sync button
+    product/product-detail.tsx # Model detail: images, overview, features, specs, versions
     preview/print-toolbar.tsx  # Client component: Save as PDF button
     ui/                        # shadcn/ui primitives
   lib/
@@ -75,10 +78,11 @@ src/
 | Comparison | `loadComparison` | comparisons | /compare/[line] |
 | Revision Log | `loadRevisionLogs` | revision_logs | /changelog/[line] |
 
-**Web Overview 使用的欄位**（各產品線命名正在統一中）：
-- `Model Description` / `Model Name` → `products.full_name`
-- `Single Overview`（優先）→ fallback `Overview` → `products.overview`
-- `Key Feature Lists` / `Key Feature` → `products.features` (JSON array)
+**Web Overview 使用的欄位**（已統一命名）：
+- `Model Name` → `products.full_name`（fallback `Model Description`）
+- `Single Overview` → `products.overview`
+- `Key Feature Lists` → `products.features` (JSON array)
+  - Sheet 內容是**純換行分隔**（非 `*` 前綴），parser 自動 strip `*`/`•`/`-` 前綴
 
 ### Smart Sync
 
@@ -131,9 +135,8 @@ Key columns:
 1. **各產品線 Datasheet 內容確認與排版優化**
    - AP 需額外加入 Radio Pattern 圖片區塊
    - 各產品線的 cover page 排版可能因內容量不同需微調
-2. **Web Overview 欄位統一** — 已完成 Sheet 端調整，程式端 parser 待更新為精確匹配
-3. **多國語言版 Datasheet** — 執行方式待討論
-4. **產品照片命名整理** — 統一所有產品線的圖片檔命名規則
+2. **多國語言版 Datasheet** — 執行方式待討論
+3. **產品照片命名整理** — 統一所有產品線的圖片檔命名規則
 
 ## Deployment
 
@@ -154,3 +157,4 @@ npm run lint   # ESLint check
 3. **Telegram 訊息 4096 字元上限** — 同步多產品時超長訊息要截斷到 4000 字
 4. **Brave 瀏覽器 PDF 多空白頁** — Brave 的 print engine 有差異，建議用 Chrome 存 PDF。已加 JS `beforeprint` event 用 body height clamping 盡量緩解
 5. **Comparison dynamic category detection** — 判斷邏輯：row 所有 model column 完全空白（連 `-` 都沒有）才算 category。`-` 代表 "不適用"，算有值
+6. **Web Overview features 格式** — Sheet 裡的 Key Feature Lists 是純換行分隔文字（非 `* ` bullet 格式），parser 需要處理兩種格式。label 欄位本身可能含換行（如 `"Key Feature Lists \n (條列式功能)"`），用 `includes()` 匹配而非 exact match

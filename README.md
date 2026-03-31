@@ -9,6 +9,12 @@
 - 產品清單：Model、版本、圖片狀態、Radio Pattern（AP）、最後編輯資訊
 - 一鍵同步 Google Sheets 資料（per product line）
 
+### Product Detail
+- Overview & Key Features（從 Google Sheets 同步）
+- 完整規格表（label 粗體靠右、value 自動斷行）
+- 產品圖片管理（自動同步 + 手動上傳）
+- 版本紀錄與 PDF 下載
+
 ### Spec Comparison
 - 跨 model 規格比較表
 - 全域搜尋、欄位排序、Column 顯示/隱藏
@@ -23,6 +29,9 @@
 - Technical Specifications（自動分頁）
 - Hardware Overview
 - 支援 browser Save as PDF 與 server-side Puppeteer 生成
+
+### Internal Docs
+- `/docs/sync` — 資料同步與通知機制說明頁（從 Dashboard footer 連結）
 
 ### Automated Sync
 - 每日 09:00（台灣時間）自動同步 Google Sheets → Supabase
@@ -81,7 +90,7 @@ Deployed on Vercel with automatic deploys from `main` branch.
 | `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase admin key (bypasses RLS) |
 | `SUPABASE_ANON_KEY` | Supabase public key |
-| `GOOGLE_SERVICE_ACCOUNT_KEY` | Google API service account JSON |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Google API service account JSON (base64) |
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token for notifications |
 | `TELEGRAM_CHAT_ID` | Telegram chat/group ID |
 | `CRON_SECRET` | Secret for Vercel Cron authorization |
