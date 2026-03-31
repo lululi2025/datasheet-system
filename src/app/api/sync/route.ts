@@ -38,6 +38,7 @@ export async function POST(request: Request) {
   const { searchParams } = new URL(request.url);
   const filterLine = searchParams.get("line");
   const filterModel = searchParams.get("model");
+  const forceSync = searchParams.get("force") === "true";
 
   const supabase = createAdminClient();
 
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
     line: string;
     synced: string[];
     errors: string[];
+    skipped?: boolean;
   }[] = [];
 
   // Collect changes for notifications
@@ -72,7 +74,7 @@ export async function POST(request: Request) {
     const lineResult = { line: pl.name, synced: [] as string[], errors: [] as string[] };
 
     try {
-      // Get sheet metadata (last modified, last editor) — optional, uses Drive API
+      // Get sheet metadata (last modified, last editor) — uses Drive API
       let metadata: { last_modified: string | null; last_editor: string | null } = {
         last_modified: null,
         last_editor: null,
@@ -81,6 +83,18 @@ export async function POST(request: Request) {
         metadata = await getSheetMetadata(pl.sheet_id);
       } catch {
         // Drive API access may not be available; continue without metadata
+      }
+
+      // Smart Sync: skip if sheet hasn't changed since last sync
+      if (
+        !forceSync &&
+        !filterModel &&
+        metadata.last_modified &&
+        pl.last_synced_at &&
+        new Date(metadata.last_modified) <= new Date(pl.last_synced_at)
+      ) {
+        results.push({ line: pl.name, synced: [], errors: [], skipped: true });
+        continue;
       }
 
       // Batch-load all models from both tabs in 3 API calls (instead of 3 per model)

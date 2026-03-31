@@ -179,14 +179,20 @@ export function DashboardContent({
   async function handleSync() {
     setSyncing(true);
     try {
-      const res = await fetch("/api/sync", { method: "POST" });
+      const res = await fetch("/api/sync?force=true", { method: "POST" });
       const data = await res.json();
       if (data.ok) {
         const totalSynced = data.results.reduce(
           (sum: number, r: { synced: string[] }) => sum + r.synced.length,
           0
         );
-        alert(`Sync complete: ${totalSynced} products updated.`);
+        const totalSkipped = data.results.filter(
+          (r: { skipped?: boolean }) => r.skipped
+        ).length;
+        const msg = totalSynced > 0
+          ? `Sync complete: ${totalSynced} products updated.`
+          : `Sync complete: all data is up to date.`;
+        alert(msg);
         router.refresh();
       } else {
         alert(`Sync failed: ${data.error || "Unknown error"}`);
