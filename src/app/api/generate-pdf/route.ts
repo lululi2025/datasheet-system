@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// Chromium binary URL for @sparticuz/chromium-min (downloaded at runtime)
+const CHROMIUM_URL =
+  "https://github.com/nichochar/chromium-brotli/releases/download/v133.0.0/chromium-v133.0.0-pack.tar";
+
+// Allow up to 60s for PDF generation
+export const maxDuration = 60;
+
 /**
  * POST /api/generate-pdf?model=ECC100
  *
@@ -35,13 +42,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Dynamically import to avoid bundling issues
-    const chromium = (await import("@sparticuz/chromium")).default;
+    const chromium = (await import("@sparticuz/chromium-min")).default;
     const puppeteer = (await import("puppeteer-core")).default;
 
-    // On Vercel, use the bundled chromium; locally, try to find Chrome
+    // On Vercel, download chromium at runtime; locally, use installed Chrome
     const executablePath = process.env.VERCEL
-      ? await chromium.executablePath()
+      ? await chromium.executablePath(CHROMIUM_URL)
       : process.platform === "darwin"
         ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
         : "/usr/bin/google-chrome";
