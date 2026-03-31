@@ -209,6 +209,7 @@ export async function getSheetMetadata(sheetId: string): Promise<SheetMetadata> 
   const res = await drive.files.get({
     fileId: sheetId,
     fields: "modifiedTime,lastModifyingUser",
+    supportsAllDrives: true,
   });
 
   return {
