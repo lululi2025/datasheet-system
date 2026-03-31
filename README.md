@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EnGenius Datasheet System
+
+自動化產品 Datasheet 生成系統，從 Google Sheets 同步產品資料，生成可列印的 PDF Datasheet。
+
+## Features
+
+### Dashboard
+- 產品線 tab 切換（Cloud AP / Cloud Switch / Cloud Camera）
+- 產品清單：Model、版本、圖片狀態、Radio Pattern（AP）、最後編輯資訊
+- 一鍵同步 Google Sheets 資料（per product line）
+
+### Spec Comparison
+- 跨 model 規格比較表
+- 全域搜尋、欄位排序、Column 顯示/隱藏
+- Sticky header + pinned 左側欄位
+
+### Change Log
+- Structured diff 表格（Field / From / To / Type）
+- Revision Log 參考紀錄
+
+### Datasheet PDF
+- Cover page：產品圖、Overview、Features
+- Technical Specifications（自動分頁）
+- Hardware Overview
+- 支援 browser Save as PDF 與 server-side Puppeteer 生成
+
+### Automated Sync
+- 每日 09:00（台灣時間）自動同步 Google Sheets → Supabase
+- Smart Sync：比對 Google Drive `modifiedTime`，未變動則跳過
+- 變更偵測：field-level + spec-level deep diff
+- Telegram 通知：同步結果自動推送
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) + TypeScript |
+| UI | Tailwind CSS v4 + shadcn/ui |
+| Table | @tanstack/react-table |
+| Database | Supabase (PostgreSQL + Storage) |
+| Data Source | Google Sheets API + Drive API |
+| PDF | Puppeteer + Browser Print |
+| Deployment | Vercel + Vercel Cron |
+| Notifications | Telegram Bot API |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in Supabase, Google, Telegram credentials
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to access the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Product Lines
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Name | Products | Google Sheet Tabs |
+|---|---|---|
+| Cloud Access Points | ECW115, ECW536, etc. | Web Overview, Detail Specs, Comparison, Revision Log |
+| Cloud Managed Switches | ECS1008P, ECS2512FP, etc. | Same structure |
+| AI Cloud Cameras | ECC100, ECC500, etc. | Same structure |
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Deployed on Vercel with automatic deploys from `main` branch.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Cron Job**: Daily at 01:00 UTC (09:00 Taiwan) via `vercel.json`
+- **Manual Sync**: Dashboard "Sync from Sheets" button
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase admin key (bypasses RLS) |
+| `SUPABASE_ANON_KEY` | Supabase public key |
+| `GOOGLE_SERVICE_ACCOUNT_KEY` | Google API service account JSON |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token for notifications |
+| `TELEGRAM_CHAT_ID` | Telegram chat/group ID |
+| `CRON_SECRET` | Secret for Vercel Cron authorization |
