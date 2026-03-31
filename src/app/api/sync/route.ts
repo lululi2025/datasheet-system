@@ -127,7 +127,7 @@ export async function POST(request: Request) {
           // Check if product already exists (for deep change detection)
           const { data: existing } = await supabase
             .from("products")
-            .select("id, subtitle, full_name, overview, features")
+            .select("id, subtitle, full_name, headline, overview, features")
             .eq("model_name", modelName)
             .single();
 
@@ -148,6 +148,8 @@ export async function POST(request: Request) {
               details.push({ field: "Subtitle", from: existing.subtitle, to: sheetData.subtitle, type: "modified" });
             if (existing.full_name !== sheetData.full_name)
               details.push({ field: "Full Name", from: existing.full_name, to: sheetData.full_name, type: "modified" });
+            if ((existing.headline ?? "") !== sheetData.headline)
+              details.push({ field: "Headline", from: existing.headline ?? "", to: sheetData.headline, type: "modified" });
             if (existing.overview !== sheetData.overview)
               details.push({ field: "Overview", from: "(previous)", to: "(updated)", type: "modified" });
 
