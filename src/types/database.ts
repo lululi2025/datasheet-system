@@ -32,6 +32,7 @@ export interface Database {
           revision_log_gid: string | null;
           comparison_gid: string | null;
           cloud_comparison_gid: string | null;
+          last_synced_at: string | null;
           created_at: string;
         };
         Insert: Omit<
@@ -166,6 +167,7 @@ export interface Database {
           edited_by: string | null;
           edited_at: string | null;
           changes_summary: string;
+          changes_detail: Json | null;
           notified: boolean;
           created_at: string;
         };

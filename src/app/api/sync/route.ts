@@ -116,28 +116,35 @@ export async function POST(request: Request) {
 
           const isNew = !existing;
 
-          // Deep diff: compare fields
-          const fieldChanges: string[] = [];
+          // Structured change detail: { field, from, to, type }
+          interface ChangeDetail {
+            field: string;
+            from: string | null;
+            to: string | null;
+            type: "added" | "removed" | "modified";
+          }
+          const details: ChangeDetail[] = [];
+
           if (!isNew) {
+            // Field-level diff
             if (existing.subtitle !== sheetData.subtitle)
-              fieldChanges.push(`Subtitle: "${existing.subtitle}" → "${sheetData.subtitle}"`);
+              details.push({ field: "Subtitle", from: existing.subtitle, to: sheetData.subtitle, type: "modified" });
             if (existing.full_name !== sheetData.full_name)
-              fieldChanges.push(`Full name: "${existing.full_name}" → "${sheetData.full_name}"`);
+              details.push({ field: "Full Name", from: existing.full_name, to: sheetData.full_name, type: "modified" });
             if (existing.overview !== sheetData.overview)
-              fieldChanges.push("Overview updated");
+              details.push({ field: "Overview", from: "(previous)", to: "(updated)", type: "modified" });
+
+            // Features diff
             if (JSON.stringify(existing.features) !== JSON.stringify(sheetData.features)) {
               const oldF = (existing.features as string[]) ?? [];
               const newF = sheetData.features;
-              const added = newF.filter((f) => !oldF.includes(f));
-              const removed = oldF.filter((f) => !newF.includes(f));
-              if (added.length > 0) fieldChanges.push(`Features added: ${added.length}`);
-              if (removed.length > 0) fieldChanges.push(`Features removed: ${removed.length}`);
+              for (const f of newF.filter((x) => !oldF.includes(x)))
+                details.push({ field: "Feature", from: null, to: f, type: "added" });
+              for (const f of oldF.filter((x) => !newF.includes(x)))
+                details.push({ field: "Feature", from: f, to: null, type: "removed" });
             }
-          }
 
-          // Deep diff: compare specs (before replacing)
-          const specChanges: string[] = [];
-          if (!isNew) {
+            // Spec-level diff
             const { data: oldSections } = await supabase
               .from("spec_sections")
               .select("category, spec_items (label, value)")
@@ -147,9 +154,8 @@ export async function POST(request: Request) {
             const oldSpecMap = new Map<string, Map<string, string>>();
             for (const s of oldSections ?? []) {
               const items = new Map<string, string>();
-              for (const i of (s.spec_items as { label: string; value: string }[]) ?? []) {
+              for (const i of (s.spec_items as { label: string; value: string }[]) ?? [])
                 items.set(i.label, i.value);
-              }
               oldSpecMap.set(s.category, items);
             }
 
@@ -160,12 +166,14 @@ export async function POST(request: Request) {
               newSpecMap.set(s.category, items);
             }
 
-            // New or removed sections
+            // New / removed sections
             for (const cat of newSpecMap.keys()) {
-              if (!oldSpecMap.has(cat)) specChanges.push(`+ Section: ${cat}`);
+              if (!oldSpecMap.has(cat))
+                details.push({ field: `Section: ${cat}`, from: null, to: "(new section)", type: "added" });
             }
             for (const cat of oldSpecMap.keys()) {
-              if (!newSpecMap.has(cat)) specChanges.push(`- Section: ${cat}`);
+              if (!newSpecMap.has(cat))
+                details.push({ field: `Section: ${cat}`, from: "(removed)", to: null, type: "removed" });
             }
 
             // Changed items within shared sections
@@ -175,19 +183,19 @@ export async function POST(request: Request) {
               for (const [label, newVal] of newItems) {
                 const oldVal = oldItems.get(label);
                 if (oldVal === undefined) {
-                  specChanges.push(`+ ${cat} > ${label}`);
+                  details.push({ field: `${cat} > ${label}`, from: null, to: newVal, type: "added" });
                 } else if (oldVal !== newVal) {
-                  specChanges.push(`${cat} > ${label}: "${oldVal}" → "${newVal}"`);
+                  details.push({ field: `${cat} > ${label}`, from: oldVal, to: newVal, type: "modified" });
                 }
               }
-              for (const label of oldItems.keys()) {
-                if (!newItems.has(label)) specChanges.push(`- ${cat} > ${label}`);
+              for (const [label, oldVal] of oldItems) {
+                if (!newItems.has(label))
+                  details.push({ field: `${cat} > ${label}`, from: oldVal, to: null, type: "removed" });
               }
             }
           }
 
-          const allFieldChanges = [...fieldChanges, ...specChanges];
-          const hasChanges = isNew || allFieldChanges.length > 0;
+          const hasChanges = isNew || details.length > 0;
 
           // Skip if nothing changed
           if (!hasChanges) {
@@ -221,10 +229,14 @@ export async function POST(request: Request) {
             continue;
           }
 
-          // Build change summary
+          // Build change summary (text for notifications)
           const changeSummary = isNew
             ? "New product added"
-            : allFieldChanges.join("\n");
+            : details.map((d) => {
+                if (d.type === "added") return `+ ${d.field}: ${d.to}`;
+                if (d.type === "removed") return `- ${d.field}: ${d.from}`;
+                return `${d.field}: ${d.from} → ${d.to}`;
+              }).join("\n");
 
           // Sync images from Google Drive → Supabase Storage
           try {
@@ -261,6 +273,7 @@ export async function POST(request: Request) {
             edited_by: metadata.last_editor,
             edited_at: metadata.last_modified,
             changes_summary: changeSummary,
+            changes_detail: isNew ? [{ field: "Product", from: null, to: modelName, type: "added" }] : details,
           });
 
           lineResult.synced.push(modelName);
@@ -360,6 +373,12 @@ export async function POST(request: Request) {
           `Extra tabs: ${err instanceof Error ? err.message : String(err)}`
         );
       }
+
+    // Update last_synced_at for Smart Sync
+    await supabase
+      .from("product_lines")
+      .update({ last_synced_at: new Date().toISOString() })
+      .eq("id", pl.id);
 
     results.push(lineResult);
   }

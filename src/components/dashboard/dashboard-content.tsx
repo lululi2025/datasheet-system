@@ -163,13 +163,18 @@ export function DashboardContent({
   products,
 }: DashboardContentProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("all");
+  // Default to first product line that has products
+  const firstLineWithProducts = productLines.find((pl) =>
+    products.some((p) => p.product_line_id === pl.id)
+  );
+  const [activeTab, setActiveTab] = useState(
+    firstLineWithProducts?.id ?? productLines[0]?.id ?? ""
+  );
   const [syncing, setSyncing] = useState(false);
 
-  const filteredProducts =
-    activeTab === "all"
-      ? products
-      : products.filter((p) => p.product_line_id === activeTab);
+  const filteredProducts = products.filter(
+    (p) => p.product_line_id === activeTab
+  );
 
   async function handleSync() {
     setSyncing(true);
@@ -230,16 +235,6 @@ export function DashboardContent({
         <div className="flex items-center justify-between mb-4">
           {/* Product line tabs with background */}
           <div className="flex gap-1 rounded-lg bg-muted p-1">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === "all"
-                  ? "bg-engenius-blue text-white shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-background"
-              }`}
-            >
-              All ({products.length})
-            </button>
             {productLines.map((pl) => {
               const count = products.filter(
                 (p) => p.product_line_id === pl.id
@@ -261,26 +256,22 @@ export function DashboardContent({
             })}
           </div>
           <div className="flex gap-2">
-            {activeTab !== "all" && (
-              <>
-                <Link
-                  href={`/compare/${encodeURIComponent(
-                    productLines.find((pl) => pl.id === activeTab)?.name ?? ""
-                  )}`}
-                  className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                >
-                  Compare
-                </Link>
-                <Link
-                  href={`/changelog/${encodeURIComponent(
-                    productLines.find((pl) => pl.id === activeTab)?.name ?? ""
-                  )}`}
-                  className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                >
-                  Change Log
-                </Link>
-              </>
-            )}
+            <Link
+              href={`/compare/${encodeURIComponent(
+                productLines.find((pl) => pl.id === activeTab)?.name ?? ""
+              )}`}
+              className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              Compare
+            </Link>
+            <Link
+              href={`/changelog/${encodeURIComponent(
+                productLines.find((pl) => pl.id === activeTab)?.name ?? ""
+              )}`}
+              className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              Change Log
+            </Link>
             <Button
               variant="outline"
               size="sm"
