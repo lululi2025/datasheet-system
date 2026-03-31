@@ -1,6 +1,34 @@
 "use client";
 
+import { useEffect } from "react";
+
 export function PrintToolbar({ model }: { model: string }) {
+  useEffect(() => {
+    // Force body height to exactly match page count during printing.
+    // This prevents Chrome from adding a trailing blank page caused by
+    // subpixel overflow or Tailwind/Next.js injected elements.
+    const beforePrint = () => {
+      const pages = document.querySelectorAll(".page");
+      document.body.style.setProperty(
+        "height",
+        `${pages.length * 792}pt`,
+        "important"
+      );
+      document.body.style.setProperty("overflow", "hidden", "important");
+    };
+    const afterPrint = () => {
+      document.body.style.removeProperty("height");
+      document.body.style.removeProperty("overflow");
+    };
+
+    window.addEventListener("beforeprint", beforePrint);
+    window.addEventListener("afterprint", afterPrint);
+    return () => {
+      window.removeEventListener("beforeprint", beforePrint);
+      window.removeEventListener("afterprint", afterPrint);
+    };
+  }, []);
+
   return (
     <div
       className="print-toolbar"
