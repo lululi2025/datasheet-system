@@ -241,7 +241,36 @@ export function DashboardContent({
 
   return (
     <div className="space-y-4">
-      {/* Tabs + actions */}
+      {/* Page header + Sync */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">
+            Product Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage datasheets across all product lines
+          </p>
+        </div>
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="inline-flex items-center gap-1.5 rounded-md bg-engenius-blue px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-engenius-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg
+            className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M1.5 8a6.5 6.5 0 0 1 11.25-4.5M14.5 8a6.5 6.5 0 0 1-11.25 4.5" />
+            <path d="M13.5 1v3.5H10M2.5 15v-3.5H6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {syncing ? "Syncing..." : "Sync from Sheets"}
+        </button>
+      </div>
+
+      {/* Tabs + nav actions */}
       <div className="flex items-center justify-between">
         <div className="flex gap-1 rounded-lg bg-muted p-1">
           {productLines.map((pl) => {
@@ -277,14 +306,6 @@ export function DashboardContent({
           >
             Change Log
           </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSync}
-            disabled={syncing}
-          >
-            {syncing ? "Syncing..." : "Sync from Sheets"}
-          </Button>
         </div>
       </div>
 
