@@ -21,13 +21,14 @@ interface ProductSummary {
   subtitle: string;
   full_name: string;
   current_version: string;
-  product_image: string;
+  has_product_image: boolean;
+  has_hardware_image: boolean;
+  radio_patterns: { band: string; h_plane: boolean; e_plane: boolean }[];
   sheet_last_modified: string | null;
   sheet_last_editor: string | null;
   updated_at: string;
   product_line_id: string;
   product_line: { name: string; label: string; category: string };
-  image_readiness: { total: number; ready: number };
 }
 
 interface DashboardContentProps {
@@ -44,27 +45,61 @@ function formatDate(dateStr: string | null) {
   });
 }
 
-function ImageReadinessBadge({
-  readiness,
-}: {
-  readiness: { total: number; ready: number };
-}) {
-  if (readiness.total === 0) {
-    return (
-      <Badge variant="outline" className="text-muted-foreground">
-        No images
-      </Badge>
-    );
-  }
-  const allReady = readiness.ready === readiness.total;
-  return (
-    <Badge variant={allReady ? "default" : "secondary"}>
-      {readiness.ready}/{readiness.total}
-    </Badge>
+/** Compact check/cross indicator */
+function ImgStatus({ ok }: { ok: boolean }) {
+  return ok ? (
+    <span className="text-green-600 text-sm font-medium" title="Ready">
+      ✓
+    </span>
+  ) : (
+    <span className="text-muted-foreground/40 text-sm" title="Missing">
+      ✗
+    </span>
   );
 }
 
-function ProductTable({ products }: { products: ProductSummary[] }) {
+/** Radio pattern cell for AP — shows bands with H/E status */
+function RadioPatternCell({
+  patterns,
+}: {
+  patterns: { band: string; h_plane: boolean; e_plane: boolean }[];
+}) {
+  if (patterns.length === 0) {
+    return <span className="text-xs text-muted-foreground/40">—</span>;
+  }
+  return (
+    <div className="flex gap-2">
+      {patterns.map((p) => {
+        const complete = p.h_plane && p.e_plane;
+        const partial = p.h_plane || p.e_plane;
+        return (
+          <Badge
+            key={p.band}
+            variant="outline"
+            className={`text-[10px] px-1.5 py-0 ${
+              complete
+                ? "border-green-300 text-green-700 bg-green-50"
+                : partial
+                  ? "border-amber-300 text-amber-700 bg-amber-50"
+                  : "text-muted-foreground"
+            }`}
+            title={`${p.band}: H-plane ${p.h_plane ? "✓" : "✗"} / E-plane ${p.e_plane ? "✓" : "✗"}`}
+          >
+            {p.band}
+          </Badge>
+        );
+      })}
+    </div>
+  );
+}
+
+function ProductTable({
+  products,
+  lineCategory,
+}: {
+  products: ProductSummary[];
+  lineCategory: string;
+}) {
   if (products.length === 0) {
     return (
       <div className="py-12 text-center text-sm text-muted-foreground">
@@ -73,18 +108,26 @@ function ProductTable({ products }: { products: ProductSummary[] }) {
     );
   }
 
+  const isAP = lineCategory.toLowerCase().includes("ap");
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[50px] text-center">#</TableHead>
+          <TableHead className="w-[42px] text-center">#</TableHead>
           <TableHead>Model</TableHead>
           <TableHead>Description</TableHead>
-          <TableHead>Version</TableHead>
+          <TableHead className="w-[70px]">Version</TableHead>
           <TableHead>Last Edited</TableHead>
           <TableHead>Edited By</TableHead>
-          <TableHead>Images</TableHead>
-          <TableHead className="w-[100px]">Actions</TableHead>
+          <TableHead className="w-[60px] text-center">Product</TableHead>
+          <TableHead className="w-[60px] text-center">Hardware</TableHead>
+          {isAP && (
+            <TableHead className="w-[120px] text-center">
+              Radio Pattern
+            </TableHead>
+          )}
+          <TableHead className="w-[80px]">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -101,7 +144,7 @@ function ProductTable({ products }: { products: ProductSummary[] }) {
                 {product.model_name}
               </Link>
             </TableCell>
-            <TableCell className="max-w-[300px] truncate text-sm text-muted-foreground">
+            <TableCell className="max-w-[260px] truncate text-sm text-muted-foreground">
               {product.subtitle || product.full_name}
             </TableCell>
             <TableCell>
@@ -110,14 +153,24 @@ function ProductTable({ products }: { products: ProductSummary[] }) {
               </Badge>
             </TableCell>
             <TableCell className="text-sm tabular-nums">
-              {formatDate(product.sheet_last_modified ?? product.updated_at)}
+              {formatDate(
+                product.sheet_last_modified ?? product.updated_at
+              )}
             </TableCell>
             <TableCell className="text-sm text-muted-foreground">
               {product.sheet_last_editor ?? "—"}
             </TableCell>
-            <TableCell>
-              <ImageReadinessBadge readiness={product.image_readiness} />
+            <TableCell className="text-center">
+              <ImgStatus ok={product.has_product_image} />
             </TableCell>
+            <TableCell className="text-center">
+              <ImgStatus ok={product.has_hardware_image} />
+            </TableCell>
+            {isAP && (
+              <TableCell className="text-center">
+                <RadioPatternCell patterns={product.radio_patterns} />
+              </TableCell>
+            )}
             <TableCell>
               <Link
                 href={`/preview/${product.model_name}`}
@@ -134,36 +187,11 @@ function ProductTable({ products }: { products: ProductSummary[] }) {
   );
 }
 
-function KpiCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-}) {
-  return (
-    <div className="rounded-xl bg-engenius-blue/5 border border-engenius-blue/15 px-5 py-4">
-      <p className="text-xs font-medium uppercase tracking-wider text-engenius-blue/70">
-        {label}
-      </p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums text-engenius-dark">
-        {value}
-      </p>
-      {sub && (
-        <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>
-      )}
-    </div>
-  );
-}
-
 export function DashboardContent({
   productLines,
   products,
 }: DashboardContentProps) {
   const router = useRouter();
-  // Default to first product line that has products
   const firstLineWithProducts = productLines.find((pl) =>
     products.some((p) => p.product_line_id === pl.id)
   );
@@ -172,6 +200,7 @@ export function DashboardContent({
   );
   const [syncing, setSyncing] = useState(false);
 
+  const activeLine = productLines.find((pl) => pl.id === activeTab);
   const filteredProducts = products.filter(
     (p) => p.product_line_id === activeTab
   );
@@ -179,8 +208,6 @@ export function DashboardContent({
   async function handleSync() {
     setSyncing(true);
     try {
-      // Sync only the active product line
-      const activeLine = productLines.find((pl) => pl.id === activeTab);
       const lineParam = activeLine
         ? `&line=${encodeURIComponent(activeLine.name)}`
         : "";
@@ -194,111 +221,80 @@ export function DashboardContent({
           0
         );
         const lineName = activeLine?.label ?? "All";
-        const msg = totalSynced > 0
-          ? `${lineName}: ${totalSynced} products synced.`
-          : `${lineName}: all data is up to date.`;
+        const msg =
+          totalSynced > 0
+            ? `${lineName}: ${totalSynced} products synced.`
+            : `${lineName}: all data is up to date.`;
         alert(msg);
         router.refresh();
       } else {
         alert(`Sync failed: ${data.error || "Unknown error"}`);
       }
     } catch (err) {
-      alert(`Sync failed: ${err instanceof Error ? err.message : String(err)}`);
+      alert(
+        `Sync failed: ${err instanceof Error ? err.message : String(err)}`
+      );
     } finally {
       setSyncing(false);
     }
   }
 
-  const totalProducts = products.length;
-  const imagesReady = products.filter(
-    (p) =>
-      p.image_readiness.total > 0 &&
-      p.image_readiness.ready === p.image_readiness.total
-  ).length;
-
-  // Find the most recent edit across all products
-  const latestEdit = products.reduce<string | null>((latest, p) => {
-    const d = p.sheet_last_modified ?? p.updated_at;
-    if (!latest) return d;
-    return d > latest ? d : latest;
-  }, null);
-
   return (
-    <div className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <KpiCard label="Total Products" value={totalProducts} />
-        <KpiCard label="Product Lines" value={productLines.length} />
-        <KpiCard
-          label="Images Ready"
-          value={`${imagesReady}/${totalProducts}`}
-          sub={imagesReady === totalProducts ? "All complete" : "Some missing"}
-        />
-        <KpiCard
-          label="Last Sync"
-          value={latestEdit ? formatDate(latestEdit) : "—"}
-          sub="From Google Sheets"
-        />
-      </div>
-
-      {/* Tabs + table */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          {/* Product line tabs with background */}
-          <div className="flex gap-1 rounded-lg bg-muted p-1">
-            {productLines.map((pl) => {
-              const count = products.filter(
-                (p) => p.product_line_id === pl.id
-              ).length;
-              if (count === 0) return null;
-              return (
-                <button
-                  key={pl.id}
-                  onClick={() => setActiveTab(pl.id)}
-                  className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                    activeTab === pl.id
-                      ? "bg-engenius-blue text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-background"
-                  }`}
-                >
-                  {pl.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href={`/compare/${encodeURIComponent(
-                productLines.find((pl) => pl.id === activeTab)?.name ?? ""
-              )}`}
-              className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            >
-              Compare
-            </Link>
-            <Link
-              href={`/changelog/${encodeURIComponent(
-                productLines.find((pl) => pl.id === activeTab)?.name ?? ""
-              )}`}
-              className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            >
-              Change Log
-            </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSync}
-              disabled={syncing}
-            >
-              {syncing ? "Syncing..." : "Sync from Sheets"}
-            </Button>
-          </div>
+    <div className="space-y-4">
+      {/* Tabs + actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-1 rounded-lg bg-muted p-1">
+          {productLines.map((pl) => {
+            const count = products.filter(
+              (p) => p.product_line_id === pl.id
+            ).length;
+            if (count === 0) return null;
+            return (
+              <button
+                key={pl.id}
+                onClick={() => setActiveTab(pl.id)}
+                className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === pl.id
+                    ? "bg-engenius-blue text-white shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background"
+                }`}
+              >
+                {pl.label} ({count})
+              </button>
+            );
+          })}
         </div>
-
-        <div className="rounded-lg border bg-card">
-          <ProductTable products={filteredProducts} />
+        <div className="flex gap-2">
+          <Link
+            href={`/compare/${encodeURIComponent(activeLine?.name ?? "")}`}
+            className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            Compare
+          </Link>
+          <Link
+            href={`/changelog/${encodeURIComponent(activeLine?.name ?? "")}`}
+            className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            Change Log
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSync}
+            disabled={syncing}
+          >
+            {syncing ? "Syncing..." : "Sync from Sheets"}
+          </Button>
         </div>
       </div>
 
+      {/* Product table */}
+      <div className="rounded-lg border bg-card">
+        <ProductTable
+          products={filteredProducts}
+          lineCategory={activeLine?.category ?? ""}
+        />
+      </div>
     </div>
   );
 }
