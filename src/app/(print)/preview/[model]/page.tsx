@@ -59,16 +59,6 @@ export default async function PreviewPage({
   const qsgUrl = `https://qr.engenius.ai/qsg/${product.model_name.toLowerCase()}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qsgUrl)}`;
   const totalPages = 1 + specPages.length + 1; // cover + specs + hardware
-  const buildTime = process.env.BUILD_TIME
-    ? new Date(process.env.BUILD_TIME).toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })
-    : null;
 
   return (
     <>
@@ -401,7 +391,6 @@ body {
               </div>
               <div className="footer-version">
                 Version {version} &nbsp; {today}
-                {buildTime && <> &nbsp;|&nbsp; Build: {buildTime}</>}
               </div>
             </div>
             <div className="footer-right">
