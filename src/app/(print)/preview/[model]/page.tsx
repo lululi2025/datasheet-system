@@ -149,12 +149,12 @@ body {
   font-weight: 500; font-size: 12pt; color: #03a9f4;
 }
 .product-subtitle {
-  position: absolute; left: 134pt; top: 150pt;
+  position: absolute; left: 134pt; top: 138pt;
   font-weight: 500; font-size: 19pt; color: #03a9f4;
 }
 .product-fullname {
-  position: absolute; left: 134pt; top: 172pt; right: 36pt;
-  font-weight: 500; font-size: 24pt; color: #231f20; line-height: 1.3;
+  position: absolute; left: 134pt; top: 160pt; right: 36pt;
+  font-weight: 500; font-size: 24pt; color: #231f20; line-height: 1.15;
 }
 .product-image-container {
   position: absolute; right: 10pt; top: 330pt;
