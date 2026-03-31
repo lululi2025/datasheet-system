@@ -59,6 +59,16 @@ export default async function PreviewPage({
   const qsgUrl = `https://qr.engenius.ai/qsg/${product.model_name.toLowerCase()}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qsgUrl)}`;
   const totalPages = 1 + specPages.length + 1; // cover + specs + hardware
+  const buildTime = process.env.BUILD_TIME
+    ? new Date(process.env.BUILD_TIME).toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+    : null;
 
   return (
     <>
@@ -70,7 +80,13 @@ export default async function PreviewPage({
 
 @page { size: letter; margin: 0; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -82,11 +98,21 @@ body {
 }
 
 @media print {
-  body { padding-top: 0 !important; background: white; margin: 0; }
-  .page { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
-  .page:last-child { page-break-after: auto; }
+  html, body {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+  }
+  .page:last-child { page-break-after: auto !important; }
   .print-toolbar { display: none !important; }
-  html, body { height: auto; overflow: visible; }
 }
 
 .page {
@@ -99,7 +125,6 @@ body {
   margin: 20px auto;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.page:last-child { page-break-after: avoid; }
 
 /* Top bar */
 .top-bar { background: #03a9f4; height: 21.4pt; width: 100%; }
@@ -375,6 +400,7 @@ body {
               </div>
               <div className="footer-version">
                 Version {version} &nbsp; {today}
+                {buildTime && <> &nbsp;|&nbsp; Build: {buildTime}</>}
               </div>
             </div>
             <div className="footer-right">
