@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +32,30 @@ function formatDate(dateStr: string | null) {
 }
 
 export function ProductDetail({ product, versions }: ProductDetailProps) {
+  const router = useRouter();
+  const [generating, setGenerating] = useState(false);
+
+  async function handleGeneratePdf() {
+    setGenerating(true);
+    try {
+      const res = await fetch(
+        `/api/generate-pdf?model=${encodeURIComponent(product.model_name)}`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+      if (data.ok && data.pdfUrl) {
+        window.open(data.pdfUrl, "_blank");
+        router.refresh();
+      } else {
+        alert(`PDF generation failed: ${data.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      alert(`PDF generation failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -52,7 +78,9 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
           <Link href={`/preview/${product.model_name}`} target="_blank">
             <Button variant="outline">Preview Datasheet</Button>
           </Link>
-          <Button>Generate PDF</Button>
+          <Button onClick={handleGeneratePdf} disabled={generating}>
+            {generating ? "Generating..." : "Generate PDF"}
+          </Button>
         </div>
       </div>
 
