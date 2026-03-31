@@ -55,8 +55,8 @@ export default async function PreviewPage({
     year: "numeric",
   });
   const productLine = product.product_lines;
-  const productUrl = `https://www.engeniustech.com/engenius-cloud/${product.model_name.toLowerCase()}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(productUrl)}`;
+  const qsgUrl = `https://qr.engenius.ai/qsg/${product.model_name.toLowerCase()}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qsgUrl)}`;
   const totalPages = 1 + specPages.length + 1; // cover + specs + hardware
 
   return (
@@ -374,7 +374,7 @@ body {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrCodeUrl} alt="QR Code" />
               </div>
-              <div className="footer-qr-label">Contact Us</div>
+              <div className="footer-qr-label">Quick Start Guide</div>
             </div>
           </div>
         </div>
