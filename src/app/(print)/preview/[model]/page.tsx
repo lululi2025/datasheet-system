@@ -274,7 +274,7 @@ body {
           alt=""
         />
         <div className="product-subtitle">{product.subtitle}</div>
-        <div className="product-fullname">{product.full_name}</div>
+        <div className="product-fullname">{product.headline || product.full_name}</div>
 
         {product.product_image && (
           <div className="product-image-container">

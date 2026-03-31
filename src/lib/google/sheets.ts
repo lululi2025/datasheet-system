@@ -30,6 +30,7 @@ export interface SheetProduct {
   subtitle: string;
   full_name: string;
   overview: string;
+  headline: string;
   features: string[];
   spec_sections: SheetSpecSection[];
 }
@@ -120,8 +121,9 @@ function parseSpecSections(rows: unknown[][], colIdx: number): SheetSpecSection[
 function parseOverviewData(
   rows: unknown[][],
   colIdx: number
-): { full_name: string; overview: string; features: string[] } {
+): { full_name: string; headline: string; overview: string; features: string[] } {
   let full_name = "";
+  let headline = "";
   let overview = "";
   const features: string[] = [];
 
@@ -136,6 +138,12 @@ function parseOverviewData(
   const descIdx = rowMap.get("Model Name") ?? rowMap.get("Model Description");
   if (descIdx !== undefined) {
     full_name = getCell(rows[descIdx], colIdx);
+  }
+
+  // Headline
+  const headlineIdx = rowMap.get("Headline");
+  if (headlineIdx !== undefined) {
+    headline = getCell(rows[headlineIdx], colIdx);
   }
 
   // Overview — prefer "Single Overview" (MKT rewrite)
@@ -175,7 +183,7 @@ function parseOverviewData(
     }
   }
 
-  return { full_name, overview, features };
+  return { full_name, headline, overview, features };
 }
 
 // ---------------------------------------------------------------------------
@@ -311,7 +319,7 @@ export async function loadProductFromSheets(
   const spec_sections = parseSpecSections(detailRows, detailCol);
 
   // Parse overview
-  let overviewData = { full_name: "", overview: "", features: [] as string[] };
+  let overviewData = { full_name: "", headline: "", overview: "", features: [] as string[] };
   if (overviewCol !== null) {
     overviewData = parseOverviewData(overviewRows, overviewCol);
   }
@@ -320,6 +328,7 @@ export async function loadProductFromSheets(
     model_name: modelNumber,
     subtitle,
     full_name: overviewData.full_name || subtitle,
+    headline: overviewData.headline,
     overview: overviewData.overview,
     features: overviewData.features,
     spec_sections,
@@ -391,7 +400,7 @@ export async function loadAllProductsFromSheet(
 
     // Parse overview from cached overview data
     const overviewCol = findModelColumn(overviewRows, modelNum);
-    let overviewData = { full_name: "", overview: "", features: [] as string[] };
+    let overviewData = { full_name: "", headline: "", overview: "", features: [] as string[] };
     if (overviewCol !== null) {
       overviewData = parseOverviewData(overviewRows, overviewCol);
     }
@@ -400,6 +409,7 @@ export async function loadAllProductsFromSheet(
       model_name: modelNum,
       subtitle,
       full_name: overviewData.full_name || subtitle,
+      headline: overviewData.headline,
       overview: overviewData.overview,
       features: overviewData.features,
       spec_sections,

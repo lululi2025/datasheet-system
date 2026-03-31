@@ -49,6 +49,7 @@ export interface Database {
           model_name: string;
           subtitle: string;
           full_name: string;
+          headline: string;
           overview: string;
           features: string[];
           product_image: string;
@@ -66,7 +67,7 @@ export interface Database {
           Partial<
             Pick<
               Database["public"]["Tables"]["products"]["Row"],
-              "id" | "created_at" | "updated_at" | "subtitle" | "full_name" | "overview" | "features" | "product_image" | "hardware_image" | "current_version" | "sheet_last_modified" | "sheet_last_editor"
+              "id" | "created_at" | "updated_at" | "subtitle" | "full_name" | "headline" | "overview" | "features" | "product_image" | "hardware_image" | "current_version" | "sheet_last_modified" | "sheet_last_editor"
             >
           >;
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;

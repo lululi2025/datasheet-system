@@ -229,6 +229,7 @@ export async function POST(request: Request) {
                 model_name: sheetData.model_name,
                 subtitle: sheetData.subtitle,
                 full_name: sheetData.full_name,
+                headline: sheetData.headline,
                 overview: sheetData.overview,
                 features: sheetData.features,
                 sheet_last_modified: metadata.last_modified,
