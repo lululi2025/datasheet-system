@@ -29,50 +29,157 @@ export default function SyncDocsPage() {
         {/* Architecture Diagram */}
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">整體架構</h2>
-          <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-xs leading-relaxed text-foreground">
-{`Google Sheets (各產品線)
-       │
-       ▼
-  POST /api/sync ──────────────────┐
-  (Vercel Cron 每天 09:00 自動觸發)  │
-  (或 Dashboard 手動按鈕觸發)        │
-       │                           │
-       ▼                           ▼
-  ┌─────────────┐           ┌────────────┐
-  │ Smart Sync  │──skip──▶  │  結束，不拉  │
-  │ 比對修改時間  │           │  資料       │
-  └──────┬──────┘           └────────────┘
-         │ 有變動
-         ▼
-  ┌─────────────┐
-  │  拉取 Sheet  │  3 API calls per product line
-  │  全部資料     │  (metadata + detail + overview)
-  └──────┬──────┘
-         │
-         ▼
-  ┌─────────────┐
-  │  Deep Diff   │  逐欄比對 subtitle, full_name, overview,
-  │  變更偵測     │  features, spec sections (每個 item)
-  └──────┬──────┘
-         │
-    ┌────┴─────┐
-    │ 有變更？  │
-    └────┬─────┘
-     No  │  Yes
-     │   ▼
-     │  ┌─────────────────┐
-     │  │ Upsert product   │
-     │  │ Replace specs    │
-     │  │ Sync images      │
-     │  │ Write change_log │
-     │  └────────┬────────┘
-     │           ▼
-     │  ┌─────────────────┐
-     │  │ Telegram 通知    │
-     │  └─────────────────┘
-     ▼
-   跳過（不寫 log、不通知）`}
-          </pre>
+
+          <div className="flex flex-col items-center gap-0 py-4">
+            {/* Google Sheets */}
+            <div className="rounded-lg border-2 border-engenius-blue bg-engenius-blue/5 px-6 py-3 text-center">
+              <p className="font-semibold text-foreground">Google Sheets</p>
+              <p className="text-xs">各產品線</p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-muted-foreground">&#9660;</div>
+            <div className="h-2 w-px bg-border" />
+
+            {/* POST /api/sync */}
+            <div className="rounded-lg border border-border bg-muted px-6 py-3 text-center">
+              <p className="font-mono text-sm font-semibold text-foreground">
+                POST /api/sync
+              </p>
+              <p className="mt-1 text-xs">
+                Vercel Cron 每天 09:00 自動觸發
+              </p>
+              <p className="text-xs">或 Dashboard 手動按鈕觸發</p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-muted-foreground">&#9660;</div>
+            <div className="h-2 w-px bg-border" />
+
+            {/* Smart Sync — branch */}
+            <div className="flex items-start gap-6">
+              {/* Main path */}
+              <div className="flex flex-col items-center">
+                <div className="rounded-lg border-2 border-amber-500/60 bg-amber-500/5 px-6 py-3 text-center">
+                  <p className="font-semibold text-foreground">Smart Sync</p>
+                  <p className="text-xs">比對 Drive modifiedTime</p>
+                </div>
+              </div>
+
+              {/* Skip arrow */}
+              <div className="flex flex-col items-center pt-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-red-500">
+                    未修改 → skip
+                  </span>
+                  <span className="text-red-500">&#9654;</span>
+                </div>
+              </div>
+
+              {/* Skip box */}
+              <div className="flex flex-col items-center pt-1">
+                <div className="rounded-lg border border-dashed border-red-400/50 bg-red-500/5 px-5 py-3 text-center">
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    結束，不拉資料
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                有變動
+              </span>
+              <span className="text-green-600 dark:text-green-400">
+                &#9660;
+              </span>
+            </div>
+            <div className="h-2 w-px bg-border" />
+
+            {/* Fetch Sheet */}
+            <div className="rounded-lg border border-border bg-muted px-6 py-3 text-center">
+              <p className="font-semibold text-foreground">拉取 Sheet 全部資料</p>
+              <p className="text-xs">
+                3 API calls / product line
+              </p>
+              <p className="text-xs">(metadata + detail + overview)</p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-muted-foreground">&#9660;</div>
+            <div className="h-2 w-px bg-border" />
+
+            {/* Deep Diff */}
+            <div className="rounded-lg border border-border bg-muted px-6 py-3 text-center">
+              <p className="font-semibold text-foreground">Deep Diff 變更偵測</p>
+              <p className="text-xs">
+                逐欄比對 subtitle, full_name, overview,
+              </p>
+              <p className="text-xs">features, spec sections</p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-muted-foreground">&#9660;</div>
+            <div className="h-2 w-px bg-border" />
+
+            {/* Decision: has changes? */}
+            <div className="rotate-45 rounded-sm border-2 border-amber-500/60 bg-amber-500/5 p-2">
+              <p className="-rotate-45 text-xs font-semibold text-foreground whitespace-nowrap">
+                有變更？
+              </p>
+            </div>
+            <div className="h-3" />
+
+            {/* Two branches */}
+            <div className="flex items-start gap-10">
+              {/* Yes path */}
+              <div className="flex flex-col items-center">
+                <span className="mb-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  Yes
+                </span>
+                <div className="h-3 w-px bg-border" />
+                <div className="text-green-600 dark:text-green-400">
+                  &#9660;
+                </div>
+                <div className="h-2 w-px bg-border" />
+
+                {/* Write DB */}
+                <div className="rounded-lg border-2 border-engenius-blue/60 bg-engenius-blue/5 px-5 py-3 text-center">
+                  <p className="font-semibold text-foreground text-sm">
+                    寫入資料庫
+                  </p>
+                  <div className="mt-1.5 space-y-0.5 text-xs">
+                    <p>Upsert product</p>
+                    <p>Replace specs</p>
+                    <p>Sync images</p>
+                    <p>Write change_log</p>
+                  </div>
+                </div>
+                <div className="h-5 w-px bg-border" />
+                <div className="text-muted-foreground">&#9660;</div>
+                <div className="h-2 w-px bg-border" />
+
+                {/* Telegram */}
+                <div className="rounded-lg border-2 border-blue-400/60 bg-blue-400/5 px-5 py-3 text-center">
+                  <p className="font-semibold text-foreground text-sm">
+                    Telegram 通知
+                  </p>
+                  <p className="text-xs">發送變更摘要</p>
+                </div>
+              </div>
+
+              {/* No path */}
+              <div className="flex flex-col items-center">
+                <span className="mb-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                  No
+                </span>
+                <div className="h-3 w-px bg-border" />
+                <div className="text-red-500">&#9660;</div>
+                <div className="h-2 w-px bg-border" />
+
+                <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted px-5 py-3 text-center">
+                  <p className="text-sm text-muted-foreground">跳過</p>
+                  <p className="text-xs">不寫 log、不通知</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <hr className="border-border" />
