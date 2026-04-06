@@ -110,9 +110,10 @@ export default function SyncDocsPage() {
             <div className="rounded-lg border border-border bg-muted px-6 py-3 text-center">
               <p className="font-semibold text-foreground">Deep Diff 變更偵測</p>
               <p className="text-sm">
-                逐欄比對 subtitle, full_name, overview,
+                產品資料：subtitle, full_name, headline,
               </p>
-              <p className="text-sm">features, spec sections</p>
+              <p className="text-sm">overview, features, spec sections</p>
+              <p className="text-sm">Comparison 表：model 增刪、value 變更</p>
             </div>
             <div className="h-6 w-px bg-border" />
             <div className="text-muted-foreground">&#9660;</div>
@@ -377,7 +378,7 @@ export default function SyncDocsPage() {
                     產品基本資料
                   </td>
                   <td className="border border-border px-3 py-2">
-                    subtitle, full_name, overview
+                    subtitle, full_name, headline, overview
                   </td>
                   <td className="border border-border px-3 py-2">字串比對</td>
                 </tr>
@@ -397,6 +398,15 @@ export default function SyncDocsPage() {
                     逐 section、逐 item 比對 label + value
                   </td>
                 </tr>
+                <tr>
+                  <td className="border border-border px-3 py-2">Comparison 表</td>
+                  <td className="border border-border px-3 py-2">
+                    comparisons (model + category + label → value)
+                  </td>
+                  <td className="border border-border px-3 py-2">
+                    偵測 model 新增/移除、value 變更（首次匯入不觸發）
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -414,12 +424,10 @@ export default function SyncDocsPage() {
                 </code>{" "}
                 (text)
               </strong>
-              ：純文字摘要，給 Telegram 通知用
+              ：壓縮成一行統計摘要，給 Telegram 通知用
             </p>
             <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed text-foreground">
-{`+ Feature: AI NPU detection
-- Feature: Old motion detection
-Wireless > Frequency Band: 2.4GHz → 2.4GHz/5GHz/6GHz`}
+{`overview modified, 2 features added, 1 feature removed, 3 specs modified`}
             </pre>
 
             <p className="text-base">
@@ -429,7 +437,7 @@ Wireless > Frequency Band: 2.4GHz → 2.4GHz/5GHz/6GHz`}
                 </code>{" "}
                 (JSONB)
               </strong>
-              ：結構化資料，給前端 Change Log 表格用
+              ：結構化資料，給前端 Change Log 表格用（完整欄位 diff）
             </p>
             <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed text-foreground">
 {`[
@@ -469,24 +477,39 @@ Wireless > Frequency Band: 2.4GHz → 2.4GHz/5GHz/6GHz`}
 
           <h3 className="text-xl font-medium text-foreground">觸發條件</h3>
           <p className="text-base">
-            同步完成後，如果有任何產品發生實際變更（
+            同步完成後，如果有任何<strong className="text-foreground">產品資料</strong>或{" "}
+            <strong className="text-foreground">Comparison 表</strong>發生實際變更（
             <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
               allChanges.length &gt; 0
             </code>
             ），系統會發送一則 Telegram 訊息。
           </p>
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-base">
+            <p className="font-medium text-foreground">⚠️ 不會觸發通知的情況</p>
+            <ul className="mt-2 list-disc pl-5 space-y-1">
+              <li>只改了 Revision Log（全量覆蓋，不做 diff）</li>
+              <li>產品資料和 Comparison 都沒有實質變更（即使 Sheet 有被編輯過）</li>
+            </ul>
+          </div>
 
           <h3 className="text-xl font-medium text-foreground">訊息格式</h3>
+          <p className="text-base">
+            每個產品只顯示一行統計摘要，不列出完整 diff 內容：
+          </p>
           <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed text-foreground">
-{`📋 Datasheet Sync Report
-2026-03-31 09:00
+{`📋 Datasheet Sync Report — Apr 6, 2026
 
-🔹 ECW536 (Cloud Access Points)
-+ Feature: WiFi 7 support
-Wireless > Max Data Rate: 2400Mbps → 5760Mbps
+【Cloud Managed Switches】5 products
+  • ECS1008P — 9 features added
+  • ECS1112FP — 9 features added, 2 specs modified
+  • ECS1528T — 7 features added
+  📊 Comparison — 1 model added, 3 values changed
 
-🔹 ECC100 (AI Cloud Cameras)
-New product added`}
+【AI Cloud Cameras】1 product
+  • ECC100 — overview modified, 3 specs modified
+
+Total: 6 product(s) updated + 1 comparison
+🔗 Details → https://ds-generator-eg.vercel.app/changelog`}
           </pre>
 
           <h3 className="text-xl font-medium text-foreground">技術細節</h3>
@@ -626,15 +649,21 @@ New product added`}
                   <td className="border border-border px-3 py-2">
                     <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
                       loadComparison
+                    </code>{" "}
+                    + <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
+                      diffComparison
                     </code>
                   </td>
                   <td className="border border-border px-3 py-2">
                     <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
                       comparisons
+                    </code>{" "}
+                    + <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
+                      change_logs
                     </code>
                   </td>
                   <td className="border border-border px-3 py-2">
-                    /compare/[line]
+                    /compare/[line] + 通知
                   </td>
                 </tr>
                 <tr>
@@ -699,6 +728,17 @@ New product added`}
                   </td>
                 </tr>
                 <tr>
+                  <td className="border border-border px-3 py-2">Headline</td>
+                  <td className="border border-border px-3 py-2">
+                    封面大標題（fallback full_name）
+                  </td>
+                  <td className="border border-border px-3 py-2">
+                    <code className="rounded bg-muted px-1.5 py-0.5 text-sm text-engenius-blue">
+                      products.headline
+                    </code>
+                  </td>
+                </tr>
+                <tr>
                   <td className="border border-border px-3 py-2">
                     Single Overview
                   </td>
@@ -724,7 +764,7 @@ New product added`}
             </table>
           </div>
           <p className="text-base italic border-l-2 border-engenius-blue/30 pl-3">
-            其他欄位（Headline, Description, Product List Tag, Product
+            其他欄位（Description, Product List Tag, Product
             Highlights）目前未使用。
           </p>
         </section>
