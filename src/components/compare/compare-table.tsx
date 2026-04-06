@@ -296,7 +296,7 @@ export function CompareTable({ models, categories }: CompareTableProps) {
       {/* Table */}
       <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
         <div className="overflow-auto max-h-[calc(100vh-240px)]">
-          <table className="w-full text-xs border-collapse">
+          <table className="min-w-max text-xs border-collapse">
             <thead className="sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="border-b-2 border-foreground/12 bg-muted">

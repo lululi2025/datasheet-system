@@ -64,9 +64,8 @@ export default async function ComparePage({
   }
 
   return (
-    <div className="px-6 py-8">
-      {/* Header area — constrained width for visual consistency */}
-      <div className="mx-auto mb-6 max-w-[1400px]">
+    <div className="mx-auto max-w-[1400px] px-6 py-8">
+      <div className="mb-6">
         <nav className="flex items-center gap-1.5 text-sm">
           <Link
             href="/dashboard"
@@ -87,11 +86,10 @@ export default async function ComparePage({
         </p>
       </div>
 
-      {/* Table area — wider to accommodate many model columns */}
       {comparisons.length > 0 ? (
         <CompareTable models={models} categories={categories} />
       ) : (
-        <div className="mx-auto max-w-[1400px] rounded-lg border bg-card py-16 text-center text-sm text-muted-foreground shadow-sm">
+        <div className="rounded-lg border bg-card py-16 text-center text-sm text-muted-foreground shadow-sm">
           No comparison data available for this product line.
         </div>
       )}
