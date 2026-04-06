@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EnGenius Datasheet System",
+  title: "Product SpecHub — EnGenius",
   description:
-    "Automated product datasheet generation for EnGenius Technologies",
+    "Product spec management and datasheet generation for EnGenius Technologies",
 };
 
 export default function RootLayout({

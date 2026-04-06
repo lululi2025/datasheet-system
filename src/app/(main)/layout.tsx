@@ -24,7 +24,7 @@ export default function MainLayout({
       <Navbar />
       <main className="flex-1">{children}</main>
       <footer className="border-t py-4 px-6 text-center text-xs text-muted-foreground">
-        EnGenius Datasheet System
+        Product SpecHub
         {buildTime && <> &nbsp;·&nbsp; Deployed: {buildTime}</>}
         &nbsp;·&nbsp;
         <Link href="/docs/sync" className="text-engenius-blue hover:underline">

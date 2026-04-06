@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -12,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { ProductLine } from "@/types/database";
 
 interface ProductSummary {
@@ -191,75 +189,20 @@ export function DashboardContent({
   productLines,
   products,
 }: DashboardContentProps) {
-  const router = useRouter();
   const firstLineWithProducts = productLines.find((pl) =>
     products.some((p) => p.product_line_id === pl.id)
   );
   const [activeTab, setActiveTab] = useState(
     firstLineWithProducts?.id ?? productLines[0]?.id ?? ""
   );
-  const [syncing, setSyncing] = useState(false);
 
   const activeLine = productLines.find((pl) => pl.id === activeTab);
   const filteredProducts = products.filter(
     (p) => p.product_line_id === activeTab
   );
 
-  async function handleSync() {
-    setSyncing(true);
-    try {
-      const lineParam = activeLine
-        ? `&line=${encodeURIComponent(activeLine.name)}`
-        : "";
-      const res = await fetch(`/api/sync?force=true${lineParam}`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (data.ok) {
-        const totalSynced = data.results.reduce(
-          (sum: number, r: { synced: string[] }) => sum + r.synced.length,
-          0
-        );
-        const lineName = activeLine?.label ?? "All";
-        const msg =
-          totalSynced > 0
-            ? `${lineName}: ${totalSynced} products synced.`
-            : `${lineName}: all data is up to date.`;
-        alert(msg);
-        router.refresh();
-      } else {
-        alert(`Sync failed: ${data.error || "Unknown error"}`);
-      }
-    } catch (err) {
-      alert(
-        `Sync failed: ${err instanceof Error ? err.message : String(err)}`
-      );
-    } finally {
-      setSyncing(false);
-    }
-  }
-
   return (
     <div className="space-y-4">
-      {/* Page header + Sync */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            Product Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Manage datasheets across all product lines
-          </p>
-        </div>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="mt-1 text-sm font-medium text-engenius-blue hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {syncing ? "Syncing..." : "Sync from Sheets"}
-        </button>
-      </div>
-
       {/* Tabs + nav actions */}
       <div className="flex items-center justify-between">
         <div className="flex gap-1 rounded-lg bg-muted p-1">
