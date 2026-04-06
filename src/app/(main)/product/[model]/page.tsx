@@ -71,7 +71,7 @@ export default async function ProductPage({
     .order("generated_at", { ascending: false }) as { data: Version[] | null };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="mx-auto max-w-[1400px] px-6 py-8">
       <ProductDetail
         product={productWithSpecs}
         versions={versionData ?? []}

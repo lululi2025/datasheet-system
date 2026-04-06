@@ -40,10 +40,7 @@ export default async function ComparePage({
   // Build structured data: models + categories with rows
   const models = [...new Set(comparisons.map((c) => c.model_name))];
 
-  const catMap = new Map<
-    string,
-    Map<string, Map<string, string>>
-  >();
+  const catMap = new Map<string, Map<string, Map<string, string>>>();
   for (const c of comparisons) {
     if (!catMap.has(c.category)) catMap.set(c.category, new Map());
     const cat = catMap.get(c.category)!;
@@ -67,26 +64,34 @@ export default async function ComparePage({
   }
 
   return (
-    <div className="mx-auto max-w-[96vw] px-4 py-8">
-      <div className="mb-6">
-        <Link
-          href="/dashboard"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          &larr; Back to Dashboard
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-foreground">
-          Spec Comparison — {productLine.label}
+    <div className="px-6 py-8">
+      {/* Header area — constrained width for visual consistency */}
+      <div className="mx-auto mb-6 max-w-[1400px]">
+        <nav className="flex items-center gap-1.5 text-sm">
+          <Link
+            href="/dashboard"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Dashboard
+          </Link>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="font-medium text-foreground">Spec Comparison</span>
+        </nav>
+        <h1 className="mt-3 text-2xl font-bold tracking-tight">
+          Spec Comparison{" "}
+          <span className="text-muted-foreground font-normal">—</span>{" "}
+          <span className="text-engenius-blue">{productLine.label}</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {models.length} models &middot; {comparisons.length} spec entries
         </p>
       </div>
 
+      {/* Table area — wider to accommodate many model columns */}
       {comparisons.length > 0 ? (
         <CompareTable models={models} categories={categories} />
       ) : (
-        <div className="rounded-lg border bg-card py-16 text-center text-sm text-muted-foreground">
+        <div className="mx-auto max-w-[1400px] rounded-lg border bg-card py-16 text-center text-sm text-muted-foreground shadow-sm">
           No comparison data available for this product line.
         </div>
       )}

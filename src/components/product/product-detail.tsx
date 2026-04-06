@@ -66,7 +66,9 @@ function ImageUploadButton({
         alert(`Upload failed: ${data.error || "Unknown error"}`);
       }
     } catch (err) {
-      alert(`Upload failed: ${err instanceof Error ? err.message : String(err)}`);
+      alert(
+        `Upload failed: ${err instanceof Error ? err.message : String(err)}`
+      );
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -77,7 +79,7 @@ function ImageUploadButton({
   const hasImage = currentUrl && !currentUrl.startsWith("cache/");
 
   return (
-    <div className="flex flex-col items-center gap-2 rounded-lg border p-4">
+    <div className="flex flex-col items-center gap-2 rounded-lg border p-4 transition-colors hover:border-engenius-blue/30">
       {hasImage ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -92,7 +94,7 @@ function ImageUploadButton({
       )}
       <span className="text-sm font-medium">{label}</span>
       <label>
-        <span className="inline-flex h-8 cursor-pointer items-center rounded-md border border-input bg-background px-3 text-xs font-medium shadow-xs hover:bg-accent hover:text-accent-foreground">
+        <span className="inline-flex h-8 cursor-pointer items-center rounded-md border border-input bg-background px-3 text-xs font-medium shadow-xs hover:bg-accent hover:text-accent-foreground transition-colors">
           {uploading ? "Uploading..." : hasImage ? "Replace" : "Upload"}
         </span>
         <input
@@ -126,7 +128,9 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
         alert(`PDF generation failed: ${data.error || "Unknown error"}`);
       }
     } catch (err) {
-      alert(`PDF generation failed: ${err instanceof Error ? err.message : String(err)}`);
+      alert(
+        `PDF generation failed: ${err instanceof Error ? err.message : String(err)}`
+      );
     } finally {
       setGenerating(false);
     }
@@ -134,27 +138,55 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1.5 text-sm">
+        <Link
+          href="/dashboard"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Dashboard
+        </Link>
+        <span className="text-muted-foreground/40">/</span>
+        <Link
+          href={`/compare/${encodeURIComponent(product.product_line.name)}`}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {product.product_line.label}
+        </Link>
+        <span className="text-muted-foreground/40">/</span>
+        <span className="font-medium text-foreground">
+          {product.model_name}
+        </span>
+      </nav>
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold">{product.model_name}</h1>
-            <Badge variant="outline">v{product.current_version}</Badge>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {product.model_name}
+            </h1>
+            <Badge variant="outline" className="tabular-nums">
+              v{product.current_version}
+            </Badge>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {product.full_name}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {product.product_line.label} · Last edited{" "}
+            Last edited{" "}
             {formatDate(product.sheet_last_modified ?? product.updated_at)}
-            {product.sheet_last_editor && ` by ${product.sheet_last_editor}`}
+            {product.sheet_last_editor &&
+              ` by ${product.sheet_last_editor}`}
           </p>
         </div>
         <div className="flex gap-2">
           <Link href={`/preview/${product.model_name}`} target="_blank">
-            <Button variant="outline">Preview Datasheet</Button>
+            <Button variant="outline" size="sm">
+              Preview Datasheet
+            </Button>
           </Link>
-          <Button onClick={handleGeneratePdf} disabled={generating}>
+          <Button size="sm" onClick={handleGeneratePdf} disabled={generating}>
             {generating ? "Generating..." : "Generate PDF"}
           </Button>
         </div>
@@ -163,7 +195,7 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
       <Separator />
 
       {/* Product Images */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="text-base">Product Images</CardTitle>
         </CardHeader>
@@ -191,7 +223,7 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
 
       {/* Overview & Features */}
       {(product.overview || product.features?.length > 0) && (
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">Overview & Features</CardTitle>
           </CardHeader>
@@ -229,32 +261,41 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
         </Card>
       )}
 
-      {/* Specs Preview */}
-      <Card>
+      {/* Specifications */}
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="text-base">Specifications</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {product.spec_sections.map((section) => (
-            <div key={section.id}>
-              <h3 className="mb-2 text-sm font-medium text-engenius-blue">
-                {section.category}
-              </h3>
+            <div
+              key={section.id}
+              className="overflow-hidden rounded-lg border"
+            >
+              {/* Category header */}
+              <div className="border-b bg-engenius-blue/[0.06] px-4 py-2">
+                <h3 className="text-sm font-semibold text-engenius-blue">
+                  {section.category}
+                </h3>
+              </div>
+              {/* Spec rows */}
               <table className="w-full table-fixed">
                 <colgroup>
-                  <col className="w-[200px]" />
+                  <col className="w-[220px]" />
                   <col />
                 </colgroup>
                 <tbody>
-                  {section.items.map((item) => (
+                  {section.items.map((item, idx) => (
                     <tr
                       key={item.id}
-                      className="border-b border-border last:border-b-0"
+                      className={`border-b border-border/50 last:border-b-0 ${
+                        idx % 2 === 1 ? "bg-muted/30" : ""
+                      }`}
                     >
-                      <td className="py-2.5 pr-4 text-right align-top text-sm font-semibold text-muted-foreground">
+                      <td className="py-2 px-4 align-top text-sm font-medium text-muted-foreground">
                         {item.label}
                       </td>
-                      <td className="py-2.5 pl-4 align-top text-sm leading-relaxed break-words">
+                      <td className="py-2 px-4 align-top text-sm leading-relaxed break-words">
                         {item.value}
                       </td>
                     </tr>
@@ -273,7 +314,7 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
       </Card>
 
       {/* Version History */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle className="text-base">Version History</CardTitle>
         </CardHeader>
@@ -285,20 +326,25 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Version</TableHead>
-                  <TableHead>Date</TableHead>
+                <TableRow className="border-b-2 border-foreground/10">
+                  <TableHead className="w-24">Version</TableHead>
+                  <TableHead className="w-32">Date</TableHead>
                   <TableHead>Changes</TableHead>
-                  <TableHead>PDF</TableHead>
+                  <TableHead className="w-24">PDF</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {versions.map((v) => (
-                  <TableRow key={v.id}>
+                {versions.map((v, idx) => (
+                  <TableRow
+                    key={v.id}
+                    className={`hover:bg-engenius-blue/[0.06] ${
+                      idx % 2 === 1 ? "bg-muted/30" : ""
+                    }`}
+                  >
                     <TableCell className="font-medium tabular-nums">
                       v{v.version}
                     </TableCell>
-                    <TableCell className="text-sm tabular-nums">
+                    <TableCell className="text-sm tabular-nums text-muted-foreground">
                       {formatDate(v.generated_at)}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -310,12 +356,23 @@ export function ProductDetail({ product, versions }: ProductDetailProps) {
                           href={v.pdf_storage_path}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-engenius-blue hover:underline"
+                          className="inline-flex items-center gap-0.5 rounded px-2 py-0.5 text-xs font-medium text-engenius-blue hover:bg-engenius-blue/10 transition-colors"
                         >
                           Download
+                          <svg
+                            className="h-3 w-3"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M5 3h8v8M13 3 6 10" />
+                          </svg>
                         </a>
                       ) : (
-                        <span className="text-sm text-muted-foreground">—</span>
+                        <span className="text-sm text-muted-foreground">
+                          —
+                        </span>
                       )}
                     </TableCell>
                   </TableRow>

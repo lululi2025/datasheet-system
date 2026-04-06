@@ -123,16 +123,22 @@ export default async function ChangeLogPage({
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
+    <div className="mx-auto max-w-[1400px] px-6 py-8">
       <div className="mb-6">
-        <Link
-          href="/dashboard"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          &larr; Back to Dashboard
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-foreground">
-          Change Log — {productLine.label}
+        <nav className="flex items-center gap-1.5 text-sm">
+          <Link
+            href="/dashboard"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Dashboard
+          </Link>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="font-medium text-foreground">Change Log</span>
+        </nav>
+        <h1 className="mt-3 text-2xl font-bold tracking-tight">
+          Change Log{" "}
+          <span className="text-muted-foreground font-normal">—</span>{" "}
+          <span className="text-engenius-blue">{productLine.label}</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Auto-detected changes from Google Sheets sync
@@ -163,7 +169,7 @@ export default async function ChangeLogPage({
                   return (
                     <div
                       key={entry.id}
-                      className="mb-4 rounded-lg border bg-card overflow-hidden"
+                      className="mb-4 rounded-lg border bg-card shadow-sm overflow-hidden"
                     >
                       {/* Entry header */}
                       <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/50 border-b">
@@ -214,7 +220,7 @@ export default async function ChangeLogPage({
                             {details.map((d, i) => (
                               <tr
                                 key={i}
-                                className="border-b last:border-0 hover:bg-muted/30"
+                                className="border-b last:border-0 hover:bg-engenius-blue/[0.06] transition-colors"
                               >
                                 <td className="px-4 py-2">
                                   <TypeBadge type={d.type} />
@@ -289,10 +295,10 @@ export default async function ChangeLogPage({
             No revision logs available for this product line.
           </div>
         ) : (
-          <div className="rounded-lg border bg-card overflow-hidden">
+          <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-muted/50 text-xs text-muted-foreground">
+                <tr className="border-b-2 border-foreground/10 bg-muted/50 text-xs text-muted-foreground">
                   <th className="px-4 py-2 text-left font-medium w-[110px]">
                     Date
                   </th>
