@@ -1,0 +1,60 @@
+{
+  "ECC100": {
+    "current_version": "1.6",
+    "history": [
+      {
+        "version": "1.0",
+        "date": "2026-03-25",
+        "changes": "Initial release - prototype",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.0.pdf"
+      },
+      {
+        "version": "1.1",
+        "date": "2026-03-25",
+        "changes": "Initial release - prototype",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.1.pdf"
+      },
+      {
+        "version": "1.2",
+        "date": "2026-03-25",
+        "changes": "Layout refinement - match original template",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.2.pdf"
+      },
+      {
+        "version": "1.3",
+        "date": "2026-03-25",
+        "changes": "Fix hero positioning",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.3.pdf"
+      },
+      {
+        "version": "1.4",
+        "date": "2026-03-25",
+        "changes": "Fine-tune spacing and positioning",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.4.pdf"
+      },
+      {
+        "version": "1.5",
+        "date": "2026-03-25",
+        "changes": "Fix overview/features spacing",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.5.pdf"
+      },
+      {
+        "version": "1.6",
+        "date": "2026-03-25",
+        "changes": "Updated",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100/DS_ECC100_v1.6.pdf"
+      }
+    ]
+  },
+  "ECC100Z": {
+    "current_version": "1.0",
+    "history": [
+      {
+        "version": "1.0",
+        "date": "2026-03-26",
+        "changes": "Initial release",
+        "file": "/Users/lulu/AI Project/Datasheet System/output/ECC100Z/DS_ECC100Z_v1.0.pdf"
+      }
+    ]
+  }
+}

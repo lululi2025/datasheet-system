@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+/* ===== GLOBAL ===== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+@page {
+    size: letter;
+    margin: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #6f6f6f;
+    font-size: 7pt;
+    line-height: 1.4;
+}
+
+/* ===== PAGE STRUCTURE ===== */
+.page {
+    width: 612pt;
+    height: 792pt;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+}
+
+.page:last-child {
+    page-break-after: avoid;
+}
+
+/* ===== TOP BAR (all pages) ===== */
+.top-bar {
+    background: #03a9f4;
+    height: 21pt;
+    width: 100%;
+}
+
+.top-bar-full {
+    background: #03a9f4;
+    height: 94pt;
+    width: 100%;
+    position: relative;
+}
+
+.top-bar-full .logo-area {
+    position: absolute;
+    left: 36pt;
+    top: 36pt;
+    width: 107pt;
+    height: 27pt;
+    background: white;
+    display: block;
+}
+
+.top-bar-full .logo-img {
+    position: absolute;
+    left: 40pt;
+    top: 38pt;
+    height: 23pt;
+}
+
+.top-bar-full .title-area {
+    position: absolute;
+    right: 27pt;
+    top: 44pt;
+}
+
+.top-bar-full .title-prefix {
+    font-weight: 300;
+    font-size: 12pt;
+    color: white;
+}
+
+.top-bar-full .title-category {
+    font-weight: 500;
+    font-size: 14pt;
+    color: white;
+}
+
+/* ===== PAGE 1: COVER ===== */
+.cover-content {
+    padding: 36pt;
+    padding-top: 50pt;
+}
+
+.product-icon {
+    width: 87pt;
+    height: 85pt;
+}
+
+.model-name {
+    position: absolute;
+    right: 27pt;
+    top: 104pt;
+    font-weight: 500;
+    font-size: 12pt;
+    color: #03a9f4;
+}
+
+.product-subtitle {
+    font-weight: 500;
+    font-size: 19pt;
+    color: #03a9f4;
+    margin-top: 8pt;
+    margin-left: 96pt;
+}
+
+.product-fullname {
+    font-weight: 500;
+    font-size: 24pt;
+    color: #231f20;
+    margin-left: 96pt;
+    line-height: 1.3;
+}
+
+.product-image-container {
+    position: absolute;
+    right: 27pt;
+    top: 250pt;
+    width: 272pt;
+    height: 243pt;
+    text-align: center;
+}
+
+.product-image-container img {
+    max-width: 250pt;
+    max-height: 220pt;
+    object-fit: contain;
+}
+
+/* Overview section */
+.section-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    margin-bottom: 8pt;
+}
+
+.overview-section {
+    position: absolute;
+    left: 36pt;
+    top: 257pt;
+    width: 280pt;
+}
+
+.overview-text {
+    font-weight: 400;
+    font-size: 12pt;
+    color: #6f6f6f;
+    line-height: 1.35;
+}
+
+/* Features section */
+.features-section {
+    position: absolute;
+    left: 0;
+    bottom: 36pt;
+    width: 100%;
+    background: #03a9f4;
+    padding: 18pt 36pt 18pt 36pt;
+}
+
+.features-section .section-title {
+    color: #03a9f4;
+    margin-bottom: 12pt;
+}
+
+.features-columns {
+    display: table;
+    width: 100%;
+}
+
+.features-col {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+    padding-right: 12pt;
+}
+
+.feature-item {
+    font-weight: 400;
+    font-size: 12pt;
+    color: #6f6f6f;
+    margin-bottom: 6pt;
+    padding-left: 14pt;
+    text-indent: -14pt;
+}
+
+.feature-item::before {
+    content: "•  ";
+    color: #6f6f6f;
+}
+
+/* Page number */
+.page-number {
+    position: absolute;
+    right: 23pt;
+    bottom: 18pt;
+    font-weight: 300;
+    font-size: 7pt;
+    color: #6f7073;
+}
+
+/* ===== PAGE 2+: SPEC TABLE ===== */
+.spec-page {
+    padding: 36pt;
+    padding-top: 0;
+}
+
+.spec-page-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    padding-top: 30pt;
+    margin-bottom: 20pt;
+}
+
+.spec-columns {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.spec-col {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+}
+
+.spec-col:first-child {
+    padding-right: 18pt;
+}
+
+.spec-col:last-child {
+    padding-left: 18pt;
+}
+
+.spec-category-header {
+    background: #03a9f4;
+    color: white;
+    font-weight: 500;
+    font-size: 8pt;
+    padding: 3pt 6pt;
+    margin-top: 10pt;
+    margin-bottom: 4pt;
+}
+
+.spec-category-header:first-child {
+    margin-top: 0;
+}
+
+.spec-row {
+    border-bottom: 0.5pt solid #bcbec0;
+    padding: 3pt 0;
+}
+
+.spec-label {
+    font-weight: 500;
+    font-size: 7pt;
+    color: #03a9f4;
+}
+
+.spec-value {
+    font-weight: 300;
+    font-size: 7pt;
+    color: #6f7073;
+    margin-top: 1pt;
+}
+
+/* ===== PAGE 3: HARDWARE OVERVIEW ===== */
+.hardware-page {
+    padding: 36pt;
+    padding-top: 0;
+}
+
+.hardware-title {
+    font-weight: 500;
+    font-size: 14pt;
+    color: #03a9f4;
+    padding-top: 32pt;
+    margin-bottom: 16pt;
+}
+
+.hardware-image-container {
+    text-align: center;
+    margin: 20pt auto;
+}
+
+.hardware-image-container img {
+    max-width: 290pt;
+    max-height: 288pt;
+    object-fit: contain;
+}
+
+.hardware-labels-list {
+    text-align: center;
+    margin-top: 16pt;
+}
+
+.hardware-label-item {
+    display: inline-block;
+    font-weight: 500;
+    font-size: 7.8pt;
+    color: #6f7073;
+    margin: 4pt 12pt;
+    padding: 3pt 8pt;
+    border: 0.5pt solid #03a9f4;
+    border-radius: 2pt;
+}
+
+/* Footer */
+.footer {
+    position: absolute;
+    bottom: 36pt;
+    left: 36pt;
+    right: 36pt;
+}
+
+.footer-disclaimer {
+    font-weight: 300;
+    font-size: 6pt;
+    color: #6d6e71;
+    line-height: 1.4;
+}
+
+.footer-version {
+    font-weight: 300;
+    font-size: 6pt;
+    color: #6d6e71;
+    margin-top: 4pt;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: COVER ==================== -->
+<div class="page">
+    <div class="top-bar-full">
+        <div class="logo-area"></div>
+        <img class="logo-img" src="/Users/lulu/AI Project/Datasheet System/static/logo/engenius_cloud_icon.png" alt="EnGenius">
+        <div class="title-area">
+            <span class="title-prefix">Datasheet |</span>
+            <span class="title-category"> AI Cloud Cameras</span>
+        </div>
+    </div>
+
+    <span class="model-name">ECC100</span>
+
+    <div class="cover-content">
+        <div style="margin-left: 96pt;">
+            <div class="product-subtitle">Cam5MP Dome IP67</div>
+            <div class="product-fullname">Cloud Managed AI Outdoor Dome with 256GB Storage</div>
+        </div>
+    </div>
+
+    
+    <div class="product-image-container">
+        <img src="/Users/lulu/AI Project/Datasheet System/cache/images/ECC100_product.png" alt="ECC100">
+    </div>
+    
+
+    <div class="overview-section">
+        <div class="section-title">Overview</div>
+        <div class="overview-text">The EnGenius Cloud Camera Cam5MP Dome (ECC100) is a cloud-managed outdoor surveillance solution for SMBs seeking scalable security. It enables seamless remote monitoring via the cloud dashboard and mobile app. This camera includes 256GB of built-in storage for reliable HD video recording, reducing reliance on traditional NVRs. Enhanced with a 5MP Sony Starvis sensor with HDR, a 132° viewing angle, and a 20m IR range, it delivers clear imaging in all lighting conditions. IP67 and IK10-rated, it is built to withstand harsh environments. Advanced AI technology detects unusual people and vehicles in real time, triggering instant alerts and enabling AI-powered searches to reduce footage review time from hours to minutes.</div>
+    </div>
+
+    <div class="features-section">
+        <div class="features-columns">
+            <div class="features-col">
+                
+                <div class="feature-item">Cloud Dashboard Management and Mobile App monitoring anywhere</div>
+                
+                <div class="feature-item">5MP Sony Starvis sensor with HDR of crystal-clear image quality day and night</div>
+                
+                <div class="feature-item">Wide view angles of 132° and long IR distance of 20m fit a complicated environment</div>
+                
+            </div>
+            <div class="features-col">
+                
+                <div class="feature-item">Camera durable 256GB storage for event and continuous recording 24x7</div>
+                
+                <div class="feature-item">IP67 and IK10 for tough weather and vandal-resistant</div>
+                
+                <div class="feature-item">AI NPU of people and vehicle detection for instant alert, search, and statistics</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="page-number">1</div>
+</div>
+
+<!-- ==================== PAGE 2: TECHNICAL SPECIFICATIONS ==================== -->
+<div class="page">
+    <div class="top-bar"></div>
+    <div class="spec-page">
+        <div class="spec-page-title">Technical Specifications</div>
+
+        <div class="spec-columns">
+            <div class="spec-col">
+                
+                <div class="spec-category-header">Optics</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Sensor</div>
+                    <div class="spec-value">1/2.8 " Sony Starvis 5MP CMOS</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Lens</div>
+                    <div class="spec-value">Fixed 3.16mm</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">View Angle</div>
+                    <div class="spec-value">H: 102°, V: 71.6°, D: 132°</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Night Vision</div>
+                    <div class="spec-value">Built-in IR LED illumination and IR cut filter</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">IR Distance</div>
+                    <div class="spec-value">>20m / 66ft</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Lens Adjustment Range</div>
+                    <div class="spec-value">Manual, Pan: 0° ~ 350°, Tilt: 0° ~ 90°, Roll: 0° ~ 350°</div>
+                </div>
+                
+                
+                <div class="spec-category-header">Video</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Resolution</div>
+                    <div class="spec-value">5MP 2592 x 1944 (4:3)</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Frame Rate</div>
+                    <div class="spec-value">20 FPS</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Video Compression</div>
+                    <div class="spec-value">H.265, H.264</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Streaming Bitrate</div>
+                    <div class="spec-value">768Kbps ~ 2.5Mbps (Optional)</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Video Processing</div>
+                    <div class="spec-value">AE, AWB, AGC, BLC, HLC, WDR, HDR, 3DNR, Privacy Mask, OSD, Video Orientation</div>
+                </div>
+                
+                
+                <div class="spec-category-header">Audio</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Audio Format</div>
+                    <div class="spec-value">AAC, G.711</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Microphone</div>
+                    <div class="spec-value">Built-in, 5m / 15ft distance</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Speaker</div>
+                    <div class="spec-value">Not supported</div>
+                </div>
+                
+                
+                <div class="spec-category-header">Advanced AI Analytics</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">AI NPU</div>
+                    <div class="spec-value">Built-in</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">People Detection and Tracking</div>
+                    <div class="spec-value">History search, People counting</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Vehicle Detection and Tracking</div>
+                    <div class="spec-value">History search, Vehicle counting</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Tampering Detection</div>
+                    <div class="spec-value">Event alert</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Restricted Area Detection</div>
+                    <div class="spec-value">Event alert, Object counting</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Cross Line Detection</div>
+                    <div class="spec-value">Event alert, Object counting</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">EnGenius Cloud AI</div>
+                    <div class="spec-value">Support</div>
+                </div>
+                
+                
+            </div>
+            <div class="spec-col">
+                
+                <div class="spec-category-header">Storage</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Storage Size</div>
+                    <div class="spec-value">256GB on board</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Retention Method</div>
+                    <div class="spec-value">24/7 seamless, Auto Recycling</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Retention Days</div>
+                    <div class="spec-value">Based on video quality and bitrate: 22 days (Good 768kbps), 20 days (Better 1.5Mbps), 10 days (Best 2Mbps)</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Storage Redundancy</div>
+                    <div class="spec-value">Support EnGenius NVS and Cloud storage</div>
+                </div>
+                
+                
+                <div class="spec-category-header">System</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">LED Indicator</div>
+                    <div class="spec-value">System power and status indicator</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">RTSP</div>
+                    <div class="spec-value">Supported</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Reset Button</div>
+                    <div class="spec-value">Internal</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Networking Interface</div>
+                    <div class="spec-value">10/100 MbE RJ45 port</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Power Method</div>
+                    <div class="spec-value">PoE 802.3af Class 3</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Max. Power Consumption</div>
+                    <div class="spec-value">6.5W</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Operating Temperature</div>
+                    <div class="spec-value">-20°C ~ 50°C / -4°F ~ 122°F</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Humidity</div>
+                    <div class="spec-value">98%</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Certifications</div>
+                    <div class="spec-value">CE, FCC</div>
+                </div>
+                
+                
+                <div class="spec-category-header">Mechanical</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Enclosure Material</div>
+                    <div class="spec-value">Aluminum alloy, Polycarbonate</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Weatherproofing</div>
+                    <div class="spec-value">IP67</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Resistance</div>
+                    <div class="spec-value">IK10</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Dimensions</div>
+                    <div class="spec-value">Ø121.7 x 94.8 mm (Ø4.79 x 3.73")</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Weight</div>
+                    <div class="spec-value">525g / 18.5oz</div>
+                </div>
+                
+                
+                <div class="spec-category-header">Management Software</div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Web Browser</div>
+                    <div class="spec-value">Chrome, Safari, Edge</div>
+                </div>
+                
+                <div class="spec-row">
+                    <div class="spec-label">Mobile App</div>
+                    <div class="spec-value">Cloud To-Go on iOS and Android</div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+    <div class="page-number">2</div>
+</div>
+
+<!-- ==================== PAGE 3: HARDWARE OVERVIEW ==================== -->
+<div class="page">
+    <div class="top-bar"></div>
+    <div class="hardware-page">
+        <div class="hardware-title">Hardware Overview</div>
+
+        
+        <div class="hardware-image-container">
+            <img src="/Users/lulu/AI Project/Datasheet System/cache/images/ECC100_hardware.png" alt="Hardware Overview">
+        </div>
+        
+
+        
+        <div class="hardware-labels-list">
+            
+            <span class="hardware-label-item">Reset Button</span>
+            
+            <span class="hardware-label-item">Lens</span>
+            
+            <span class="hardware-label-item">Microphone</span>
+            
+            <span class="hardware-label-item">Light Sensor</span>
+            
+            <span class="hardware-label-item">IR LEDs</span>
+            
+            <span class="hardware-label-item">PoE In</span>
+            
+            <span class="hardware-label-item">LED Indicator</span>
+            
+        </div>
+        
+    </div>
+
+    <div class="footer">
+        <div class="footer-disclaimer">
+            Features and specifications subject to change without notice. Trademarks and registered trademarks are the property of their respective owners. These limits are designed to provide reasonable
+            protection against harmful interference in a residential installation. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the
+            instructions, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required
+            to correct the interference at his/her own expense. Prior to installing any surveillance equipment, it is your responsibility to ensure the installation is in compliance with local, state and federal video
+            and audio surveillance and privacy laws.
+        </div>
+        <div class="footer-version">Version 1.1   03/25/2026</div>
+    </div>
+
+    <div class="page-number">3</div>
+</div>
+
+</body>
+</html>
